@@ -3,15 +3,17 @@ import cv2
 from matplotlib import pyplot as plt
 import os
 from lxml import etree as ET
+import json
 
 class dataset():
 
-    def __init__(self, folder='train', nr_images=100, polygon=[-1, None], background_colour=255, img_height=224, img_width=224, nr_channels=3,
+    def __init__(self, config_file=None, folder='train', nr_images=100, polygon=[-1, None], background_colour=255, img_height=224, img_width=224, nr_channels=3,
     nr_shapes=20, nr_tries=100, rad_min=224/32, rad_max=224/16, overlap=False, occlusion=False, rotation=True, noise=False, min_nr_vertices=3, max_nr_vertices=13):
 
         """ Class constructor
             :param self
             :param folder='train': directory where dataset is to be stored/imported from
+            :param config_file=None: configuration file where parameters reside if not None. If None, parameters are passed as constructor args.
             :param nr_images=100: number of generated images
             :param polygon=[-1, None]: target polygon used to generate annotations given by its parameters p and q (if p equals -1, 
             corresponding to a circle, then q is irrelevant)
@@ -34,24 +36,99 @@ class dataset():
         """  
 
 
-        self.folder = folder
-        self.nr_images = nr_images
-        self.polygon = polygon
-        self.background_colour = background_colour
-        self.img_height = img_height
-        self.img_width = img_width
-        self.nr_channels = nr_channels
-        self.nr_shapes = nr_shapes
-        self.nr_tries = nr_tries
-        self.rad_min = rad_min
-        self.rad_max = rad_max
-        self.overlap = overlap
-        self.occlusion = occlusion
-        self.rotation = rotation
-        self.noise = noise
-        self.min_nr_vertices = min_nr_vertices
-        self.max_nr_vertices = max_nr_vertices
+        if(config_file is None):
+            self.folder = folder
+            self.nr_images = nr_images
+            self.polygon = polygon
+            self.background_colour = background_colour
+            self.img_height = img_height
+            self.img_width = img_width
+            self.nr_channels = nr_channels
+            self.nr_shapes = nr_shapes
+            self.nr_tries = nr_tries
+            self.rad_min = rad_min
+            self.rad_max = rad_max
+            self.overlap = overlap
+            self.occlusion = occlusion
+            self.rotation = rotation
+            self.noise = noise
+            self.min_nr_vertices = min_nr_vertices
+            self.max_nr_vertices = max_nr_vertices
+        else:
+            if(self.json_parse(config_file) == -1):
+                return None
 
+    def create_default_config_file(self):
+        """
+            :param self
+
+            :return -1 in case of error
+        """
+
+        file = {}
+        file['folder'] = self.folder
+        file['nr_images'] = self.nr_images
+        file['polygon'] = []
+        file['polygon'].append({
+            'p': self.polygon[0],
+            'q': self.polygon[1]
+        })
+        file['background_color'] = self.background_colour
+        file['img_height'] = self.img_height
+        file['img_width'] = self.img_width
+        file['nr_channels'] = self.nr_channels
+        file['nr_shapes_per_img'] = self.nr_shapes
+        file['nr_tries'] = self.nr_tries
+        file['rad_min'] = self.rad_min
+        file['rad_max'] = self.rad_max
+        file['overlap'] = self.overlap
+        file['occlusion'] = self.occlusion
+        file['rotation'] = self.rotation
+        file['noise'] = self.noise
+        file['min_nr_vertices'] = self.min_nr_vertices
+        file['max_nr_vertices'] = self.max_nr_vertices
+
+        try:
+            with open('config.json', 'w') as outfile:  
+                json.dump(file, outfile, indent=4)
+        except OSError as err:
+            print('Error parsing json file. Please check filename.')
+            return -1
+
+    def json_parse(self, file):
+        """ json parser
+            :param self
+            :param file: file to be parsed
+
+            :return -1 in case of error
+        """
+
+        try:
+            with open(file) as json_file:  
+                data = json.load(json_file)
+                self.folder = data['folder']
+                self.nr_images = data['nr_images']
+                self.polygon = np.zeros(2)
+                for elem in data['polygon']:
+                    self.polygon[0] = elem['p']
+                    self.polygon[1] = elem['q']
+                self.background_colour = data['background_color'] 
+                self.img_height = data['img_height']
+                self.img_width = data['img_width']
+                self.nr_channels = data['nr_channels']
+                self.nr_shapes = data['nr_shapes_per_img']
+                self.nr_tries = data['nr_tries']
+                self.rad_min = data['rad_min']
+                self.rad_max = data['rad_max'] 
+                self.overlap = data['overlap']
+                self.occlusion = data['occlusion']
+                self.rotation = data['rotation']
+                self.noise = data['noise']
+                self.min_nr_vertices = data['min_nr_vertices']
+                self.max_nr_vertices = data['max_nr_vertices']
+        except (OSError) as err:
+            print('Error parsing json file. Please check filename.')
+            return -1
 
     def create_image(self, name, folder_path):
         """ method to create an image and its xml annotation file in Pascal VOC format
@@ -202,7 +279,7 @@ class dataset():
             :param var: variance of the Gaussian distribution
             :param noise_type='gaussian': type of noise (for now just supports Gaussian noise)
 
-            :return None
+            :return image with noise or None if an error occurred
         """  
         if (noise_type == 'gaussian'):
             row,col,ch = img.shape
@@ -210,11 +287,10 @@ class dataset():
             stdev = np.sqrt(var)
             gauss = stdev*np.random.randn(row, col, ch) + mean
             gauss = gauss.reshape(row,col,ch)
-            final = img + gauss
+            final = img + (255 - self.background_colour) - gauss
             return final.astype('uint8')
         
-        return None
-        
+        return None       
 
     def create_dataset(self):
         """ method for creating a dataset with nr_images and their respective xml annotation files
@@ -240,7 +316,7 @@ class dataset():
 
             filepath = self.folder+'/'+str(i)+'.png'
             if(self.noise == True):
-                img = noise_gen(img, 5, 5)
+                img = self.noise_gen(img, 5, 5)
             try:    
                 cv2.imwrite(filepath,img)
             except:
@@ -280,7 +356,6 @@ class dataset():
                 subelem_pairs = {}
         
         return entry
-
 
     def import_dataset(self, folder_path=None, nr_images=None):
 

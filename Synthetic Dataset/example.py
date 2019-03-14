@@ -1,7 +1,10 @@
 from SyntDataset import dataset
 
 #example 1 - creating dataset
-created_dataset = dataset(nr_shapes=10)
+#created_dataset.create_default_config_file()
+
+created_dataset = dataset(config_file='config.json')
+#created_dataset = dataset()
 created_dataset.create_dataset()
 
 #example 2 - importing dataset
