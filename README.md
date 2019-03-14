@@ -1,5 +1,5 @@
 # xML
-MsC Dissertation code repository
+MsC Dissertation on Explanatory Machine (Deep) Learning, specifically CNNs (Convolutional Neural Networks).
 
 ## Installation
 To run the scripts, the following modules need to be installed:
