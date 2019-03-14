@@ -3,7 +3,10 @@ Synthetic Dataset composed by images containing polygons. Each polygon is define
 
 Each polygon is randomly placed in the image, considering overlap, occlusion and rotation constraints.
 
-For each generated image, annotations are created in Pascal VOC format, containing information regarding image characteristics and also the classification problem being solved. The polygon one is trying to identify is given, along with information about its existance in the image. If the polygon is present in the image, then bounding boxes are provided for each instance of the desired polygon.
+For each generated image, annotations are created in Pascal VOC format, containing information regarding image characteristics and also the classification problem being solved. The polygon one is trying to identify is given, along with information about its existance in the image. If the polygon is present in the image, then bounding boxes are provided for each instance of the desired polygon. As of now, labels for problems like the ones described below are provided:
+ * Does polygon X exist or not in the image?
+ * How many X polygons exist in the image?
+ * Where are polygons X located in the image?
 
 ## Configurable Parameters
   * folder='train': directory where dataset is to be stored/imported from
