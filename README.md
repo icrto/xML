@@ -9,6 +9,7 @@ To run the scripts, the following modules need to be installed:
   * matplotlib
   * os
   * lxml
+  * json
 
 ## Instructions
   Running the scripts
