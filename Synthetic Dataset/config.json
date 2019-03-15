@@ -4,7 +4,7 @@
     "polygon": [
         {
             "p": -1,
-            "q": null
+            "q": "None"
         }
     ],
     "background_color": 255,
