@@ -1,5 +1,7 @@
 import numpy as np
 import cv2
+import matplotlib
+matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
 import os
 from lxml import etree as ET
@@ -62,7 +64,7 @@ class dataset():
         """
             :param self
 
-            :return -1 in case of error
+            :return 0 if successfull or -1 in case of error
         """
 
         file = {}
@@ -95,12 +97,14 @@ class dataset():
             print('Error parsing json file. Please check filename.')
             return -1
 
+        return 0
+
     def json_parse(self, file):
         """ json parser
             :param self
             :param file: file to be parsed
 
-            :return -1 in case of error
+            :return 0 if successfull or -1 in case of error
         """
 
         try:
@@ -111,7 +115,10 @@ class dataset():
                 self.polygon = np.zeros(2)
                 for elem in data['polygon']:
                     self.polygon[0] = elem['p']
-                    self.polygon[1] = elem['q']
+                    if(elem['p'] == -1):
+                        self.polygon[1] = None
+                    else: 
+                        self.polygon[1] = elem['q']
                 self.background_colour = data['background_color'] 
                 self.img_height = data['img_height']
                 self.img_width = data['img_width']
@@ -129,6 +136,7 @@ class dataset():
         except (OSError) as err:
             print('Error parsing json file. Please check filename.')
             return -1
+        return 0
 
     def create_image(self, name, folder_path):
         """ method to create an image and its xml annotation file in Pascal VOC format
@@ -163,7 +171,10 @@ class dataset():
     
         poly = ET.SubElement(ann, "polygon")
         ET.SubElement(poly, "p").text = str(self.polygon[0])
-        ET.SubElement(poly, "q").text = str(self.polygon[1])
+        if(self.polygon[0] == -1):
+            ET.SubElement(poly, "q").text = 'None'
+        else:
+            ET.SubElement(poly, "q").text = str(self.polygon[1])
 
 
         # number of specified polygons found
@@ -245,8 +256,7 @@ class dataset():
                         255-self.background_colour), thickness=1, lineType=cv2.LINE_AA)
                 
                 #create bounding box in xml file if the polygon that was just drawn equals the desired polygon
-                if(p == self.polygon[0] and q == self.polygon[1]):
-                    ET.SubElement(ann, "exists").text = str(1)
+                if((p == self.polygon[0] and q == self.polygon[1]) or (p == self.polygon[0] and self.polygon[0] == -1)):
                     bndbox = ET.SubElement(ann, "bndbox"+str(polycount))
                     ET.SubElement(bndbox, "xmin").text = str(x_orig-rad)
                     ET.SubElement(bndbox, "ymin").text = str(y_orig-rad)
@@ -256,9 +266,8 @@ class dataset():
 
             else: tries += 1 # polygon cannot be placed inside image, trying again
 
-        #no polygons equal to self.polygon were found -> exists = 0
-        if(polycount == 0):
-            ET.SubElement(ann, "exists").text = str(0)
+        # how many desired polygons exist in the image
+        ET.SubElement(ann, "exists").text = str(polycount)
 
         try:    
             tree = ET.ElementTree(ann)
@@ -268,7 +277,6 @@ class dataset():
             return
 
         return img
-
 
     def noise_gen(self, img, mean, var, noise_type='gaussian'):
         
@@ -297,12 +305,12 @@ class dataset():
             if the destination folder does not yet exist, it is created
             :param self
             
-            :return None
+            :return 0 or -1 in case of error
         """  
         print("Creating dataset...")
         if((self.polygon[0] != -1) and (self.polygon[1] != None) and (self.polygon[1] >= self.polygon[0] / 2)):
             print("Invalid polygon. Please try again with q < p/2")
-            return 
+            return -1
         
 
         if(not os.path.exists(self.folder)):
@@ -312,7 +320,7 @@ class dataset():
             img = self.create_image(i, self.folder)
             if(img is None):
                 print('Error creating image.')
-                return
+                return -1
 
             filepath = self.folder+'/'+str(i)+'.png'
             if(self.noise == True):
@@ -321,17 +329,17 @@ class dataset():
                 cv2.imwrite(filepath,img)
             except:
                 print('Error writing image. Check filepath.')
-                return
+                return -1
         
         print("Dataset created.")
-        return
+        return 0
 
     def xml_parse(self, filename):
         """ method for parsing xml annotation files
             :param self
             :param filename: name of xml file to be parsed or None if an error occurred
         
-            :return parsed xml file
+            :return parsed xml file or None in case of error
         """  
         try:
             tree = ET.parse(filename)
@@ -389,5 +397,34 @@ class dataset():
         print("Dataset successfully imported.")
         return annotations
 
+    def display_img(self, img, bndboxes=None):
+        """ method that displays an image and its bounding boxes if bndbox is not None
 
+        :param self
+        :param img: image to be displayed
+        :param **kwargs: bounding boxes to be displayed
+
+        :return None
+        """
+
+        for bndbox in bndboxes:
+            cv2.rectangle(img, bndbox[0], bndbox[1], (0, 255, 0), thickness=1, lineType=cv2.LINE_AA)
+        
+        plt.imshow(img)
+        plt.show()
+
+    def get_bndboxes(self, dict):
+        """ method to get bounding boxes from dictionary entry
+
+        :param self
+        :param dict: dictionary entry from which bounding boxes are to be extracted
+
+        :return extracted bounding boxes or None if none exist
+        """
+
+        nr_bndboxes = int(dict['exists'])
+        bndboxes = []
+        for i in range(nr_bndboxes):
+            bndboxes.append(((int(dict['bndbox'+str(i)]['xmin']), int(dict['bndbox'+str(i)]['ymin'])), (int(dict['bndbox'+str(i)]['xmax']), int(dict['bndbox'+str(i)]['ymax']))))  
+        return bndboxes  
 
