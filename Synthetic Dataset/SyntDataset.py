@@ -1,7 +1,5 @@
 import numpy as np
 import cv2
-import matplotlib
-matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
 import os
 from lxml import etree as ET
@@ -10,7 +8,7 @@ import json
 class dataset():
 
     def __init__(self, config_file=None, folder='train', nr_images=100, polygon=[-1, None], background_colour=255, img_height=224, img_width=224, nr_channels=3,
-    nr_shapes=20, nr_tries=100, rad_min=224/32, rad_max=224/16, overlap=False, occlusion=False, rotation=True, noise=False, min_nr_vertices=3, max_nr_vertices=13):
+    nr_shapes=20, nr_tries=100, rad_min=224/32, rad_max=224/16, overlap=False, occlusion=False, rotation=True, noise=False, min_nr_vertices=3, max_nr_vertices=13, min_nr_shapes=1, max_nr_shapes=20):
 
         """ Class constructor
             :param self
@@ -33,6 +31,8 @@ class dataset():
             :param noise=False: add Gaussian noise to image if True
             :param min_nr_vertices=3: minimum number of vertices
             :param max_nr_vertices=13: maximum number of vertices
+            :param min_nr_shapes=1: minimum number of polygons per image
+            :param max_nr_shapes=20: maximum number of polygons per image
 
             :return dataset object
         """  
@@ -56,6 +56,9 @@ class dataset():
             self.noise = noise
             self.min_nr_vertices = min_nr_vertices
             self.max_nr_vertices = max_nr_vertices
+            self.min_nr_shapes = min_nr_shapes
+            self.max_nr_shapes = max_nr_shapes
+
         else:
             if(self.json_parse(config_file) == -1):
                 return None
@@ -89,6 +92,8 @@ class dataset():
         file['noise'] = self.noise
         file['min_nr_vertices'] = self.min_nr_vertices
         file['max_nr_vertices'] = self.max_nr_vertices
+        file['min_nr_shapes'] = self.min_nr_shapes
+        file['max_nr_shapes'] = self.max_nr_shapes
 
         try:
             with open('config.json', 'w') as outfile:  
@@ -133,6 +138,9 @@ class dataset():
                 self.noise = data['noise']
                 self.min_nr_vertices = data['min_nr_vertices']
                 self.max_nr_vertices = data['max_nr_vertices']
+                self.min_nr_shapes = data['min_nr_shapes']
+                self.max_nr_shapes = data['max_nr_shapes']
+
         except (OSError) as err:
             print('Error parsing json file. Please check filename.')
             return -1
@@ -141,8 +149,9 @@ class dataset():
     def create_image(self, name, folder_path):
         """ method to create an image and its xml annotation file in Pascal VOC format
             each image is created according to the class parameters, such as img_height, img_width, nr_channels, background_colour, etc
-            each image contains nr_shapes with randomly chosen number of p and q (vertices and jumps) from a set of 
+            each image contains nr_shapes, if nr_shapes differs from -1, with randomly chosen number of p and q (vertices and jumps) from a set of 
             valid number of vertices which ranges from min_nr_vertices to max_nr_vertices
+            if nr_shapes equals -1 then each image has a randomly defined number of polygons, between min_nr_shapes and max_nr_shapes
             each shape's envolving circumference has a randomly chosen radius from min_rad to max_rad
             each shape is randomly positioned in the image considering, or not, overlap, occlusion, rotation and noise
             if nr_tries is exceeded when trying to place a polygon in the image, None is returned
@@ -182,10 +191,18 @@ class dataset():
 
         # number of tries before giving up when a shape cannot be placed in the image
         tries = 0
+
+        # choose randomly the number of shapes per image
+        if(self.nr_shapes == -1):
+            valid_nr_shapes = list(range(self.min_nr_shapes, self.max_nr_shapes))
+            nr_shapes = np.random.choice(valid_nr_shapes, size=None, replace=True)
+        else:
+            nr_shapes = self.nr_shapes
+
         while True:
             
             # nr_shapes polygons were drawn...finish
-            if(count > self.nr_shapes - 1): break
+            if(count > nr_shapes - 1): break
 
             # defined number of tries was exceeded...throw an error    
             if(tries > self.nr_tries):
@@ -271,7 +288,7 @@ class dataset():
 
         try:    
             tree = ET.ElementTree(ann)
-            tree.write(folder_path+'/'+str(name)+'.xml', pretty_print=True)
+            tree.write(os.path.join(folder_path, str(name)+'.xml'), pretty_print=True)
         except:
             print('Error creating xml annotation file.')
             return
@@ -322,7 +339,7 @@ class dataset():
                 print('Error creating image.')
                 return -1
 
-            filepath = self.folder+'/'+str(i)+'.png'
+            filepath = os.path.join(self.folder, str(i)+'.png')
             if(self.noise == True):
                 img = self.noise_gen(img, 5, 5)
             try:    
@@ -379,20 +396,20 @@ class dataset():
         nr_images = self.nr_images if nr_images is None else nr_images
         folder_path = self.folder if folder_path is None else folder_path
 
-        annotations = {}
+        annotations = []
         for i in range(nr_images):
-            img = cv2.imread(folder_path+'/'+str(i)+'.png')
+            img = cv2.imread(os.path.join(folder_path, str(i)+'.png'))
             if(img is None):
                 print('Image could not be loaded. Check folder.')
                 return
 
-            aux = self.xml_parse(folder_path+'/'+str(i)+'.xml')
+            aux = self.xml_parse(os.path.join(folder_path, str(i)+'.xml'))
             if(aux is None):
                 print('XML file could not be loaded.')
                 return
 
-            annotations[i] = aux
-            annotations[i]['img'] = img
+            aux['img'] = img
+            annotations.append(aux)
             
         print("Dataset successfully imported.")
         return annotations

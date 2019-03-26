@@ -1,17 +1,17 @@
 {
-    "folder": "train",
-    "nr_images": 100,
+    "folder": "train_rdn",
+    "nr_images": 1000,
     "polygon": [
         {
-            "p": -1,
-            "q": "None"
+            "p": 5,
+            "q": 2
         }
     ],
     "background_color": 255,
     "img_height": 224,
     "img_width": 224,
     "nr_channels": 3,
-    "nr_shapes_per_img": 10,
+    "nr_shapes_per_img": -1,
     "nr_tries": 100,
     "rad_min": 7.0,
     "rad_max": 14.0,
@@ -20,5 +20,7 @@
     "rotation": true,
     "noise": false,
     "min_nr_vertices": 3,
-    "max_nr_vertices": 13
+    "max_nr_vertices": 13,
+    "min_nr_shapes": 3,
+    "max_nr_shapes": 20
 }
