@@ -8,7 +8,7 @@ import json
 class dataset():
 
     def __init__(self, config_file=None, folder='train', nr_images=100, polygon=[-1, None], background_colour=255, img_height=224, img_width=224, nr_channels=3,
-    nr_shapes=20, nr_tries=100, rad_min=224/32, rad_max=224/16, overlap=False, occlusion=False, rotation=True, noise=False, min_nr_vertices=3, max_nr_vertices=13, min_nr_shapes=1, max_nr_shapes=20):
+    nr_shapes=20, nr_tries=100, rad_min=224/32, rad_max=224/16, overlap=False, occlusion=False, rotation=True, noise=False, min_nr_vertices=3, max_nr_vertices=13, min_nr_shapes=1, max_nr_shapes=20, simplified=False):
 
         """ Class constructor
             :param self
@@ -33,7 +33,7 @@ class dataset():
             :param max_nr_vertices=13: maximum number of vertices
             :param min_nr_shapes=1: minimum number of polygons per image
             :param max_nr_shapes=20: maximum number of polygons per image
-
+            :param simplified=False: simplified version of the dataset
             :return dataset object
         """  
 
@@ -58,6 +58,7 @@ class dataset():
             self.max_nr_vertices = max_nr_vertices
             self.min_nr_shapes = min_nr_shapes
             self.max_nr_shapes = max_nr_shapes
+            self.simplified = simplified
 
         else:
             if(self.json_parse(config_file) == -1):
@@ -94,6 +95,7 @@ class dataset():
         file['max_nr_vertices'] = self.max_nr_vertices
         file['min_nr_shapes'] = self.min_nr_shapes
         file['max_nr_shapes'] = self.max_nr_shapes
+        file['simplified'] = self.simplified
 
         try:
             with open('config.json', 'w') as outfile:  
@@ -140,6 +142,7 @@ class dataset():
                 self.max_nr_vertices = data['max_nr_vertices']
                 self.min_nr_shapes = data['min_nr_shapes']
                 self.max_nr_shapes = data['max_nr_shapes']
+                self.simplified = data['simplified']
 
         except (OSError) as err:
             print('Error parsing json file. Please check filename.')
@@ -168,6 +171,7 @@ class dataset():
         img.fill(self.background_colour)
         centers = []
         count = 0
+        first = True
         
         #xml annotation file    
         ann = ET.Element("annotation")
@@ -210,10 +214,18 @@ class dataset():
                 return
                 
 
-            # only consider this set of valid number of vertices
-            valid_interval_vertices = [-1] + list(range(self.min_nr_vertices, self.max_nr_vertices))
-            p = np.random.choice(valid_interval_vertices, size=None, replace=True) # choose number of vertices from previous set of values  
-            
+            if(self.simplified):
+                if(first):
+                    p = int(self.polygon[0])
+                    q = int(self.polygon[1])
+                    first = False
+                else:
+                    p = -1
+            else:
+                # only consider this set of valid number of vertices
+                valid_interval_vertices = [-1] + list(range(self.min_nr_vertices, self.max_nr_vertices))
+                p = np.random.choice(valid_interval_vertices, size=None, replace=True) # choose number of vertices from previous set of values  
+                
             if(p != -1):
                 q = np.random.randint(1, int(p/2+0.5)) # q < p/2 without loss of generality
                 step = 2 * np.pi / p
@@ -273,6 +285,7 @@ class dataset():
                         255-self.background_colour), thickness=1, lineType=cv2.LINE_AA)
                 
                 #create bounding box in xml file if the polygon that was just drawn equals the desired polygon
+              
                 if((p == self.polygon[0] and q == self.polygon[1]) or (p == self.polygon[0] and self.polygon[0] == -1)):
                     bndbox = ET.SubElement(ann, "bndbox"+str(polycount))
                     ET.SubElement(bndbox, "xmin").text = str(x_orig-rad)

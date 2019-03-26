@@ -1,10 +1,10 @@
 {
-    "folder": "train_rdn",
+    "folder": "train_simplified",
     "nr_images": 1000,
     "polygon": [
         {
-            "p": 5,
-            "q": 2
+            "p": 3,
+            "q": 1
         }
     ],
     "background_color": 255,
@@ -22,5 +22,6 @@
     "min_nr_vertices": 3,
     "max_nr_vertices": 13,
     "min_nr_shapes": 3,
-    "max_nr_shapes": 20
+    "max_nr_shapes": 20,
+    "simplified": true
 }
