@@ -10,6 +10,7 @@ To run the scripts, the following modules need to be installed:
   * os
   * lxml
   * json
+  * pickle
 
 ## Instructions
   Running the scripts
