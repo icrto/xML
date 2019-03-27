@@ -14,7 +14,7 @@
     "nr_shapes_per_img": -1,
     "nr_tries": 100,
     "rad_min": 7.0,
-    "rad_max": 14.0,
+    "rad_max": 20.0,
     "overlap": true,
     "occlusion": false,
     "rotation": true,
@@ -23,5 +23,7 @@
     "max_nr_vertices": 13,
     "min_nr_shapes": 3,
     "max_nr_shapes": 20,
-    "simplified": true
+    "simplified": true,
+    "poly_colour": [0, 255, 0],
+    "start_index": 0
 }
