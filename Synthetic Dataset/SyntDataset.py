@@ -4,11 +4,13 @@ from matplotlib import pyplot as plt
 import os
 from lxml import etree as ET
 import json
+import pickle
 
 class dataset():
 
     def __init__(self, config_file=None, folder='train', nr_images=100, polygon=[-1, None], background_colour=255, img_height=224, img_width=224, nr_channels=3,
-    nr_shapes=20, nr_tries=100, rad_min=224/32, rad_max=224/16, overlap=False, occlusion=False, rotation=True, noise=False, min_nr_vertices=3, max_nr_vertices=13, min_nr_shapes=1, max_nr_shapes=20, simplified=False):
+    nr_shapes=20, nr_tries=100, rad_min=224/32, rad_max=224/16, overlap=False, occlusion=False, rotation=True, noise=False, min_nr_vertices=3, max_nr_vertices=13, 
+    min_nr_shapes=1, max_nr_shapes=20, simplified=False, poly_colour=False, start_index=0):
 
         """ Class constructor
             :param self
@@ -34,6 +36,9 @@ class dataset():
             :param min_nr_shapes=1: minimum number of polygons per image
             :param max_nr_shapes=20: maximum number of polygons per image
             :param simplified=False: simplified version of the dataset
+            :param poly_colour=False: colour for the target polygon
+            :param start_index=0: start index for image naming (useful when one wants to add images to existing dataset)
+
             :return dataset object
         """  
 
@@ -59,6 +64,8 @@ class dataset():
             self.min_nr_shapes = min_nr_shapes
             self.max_nr_shapes = max_nr_shapes
             self.simplified = simplified
+            self.poly_colour = poly_colour
+            self.start_index = start_index
 
         else:
             if(self.json_parse(config_file) == -1):
@@ -96,6 +103,8 @@ class dataset():
         file['min_nr_shapes'] = self.min_nr_shapes
         file['max_nr_shapes'] = self.max_nr_shapes
         file['simplified'] = self.simplified
+        file['poly_colour'] = self.poly_colour
+        file['start_index'] = self.start_index
 
         try:
             with open('config.json', 'w') as outfile:  
@@ -143,6 +152,8 @@ class dataset():
                 self.min_nr_shapes = data['min_nr_shapes']
                 self.max_nr_shapes = data['max_nr_shapes']
                 self.simplified = data['simplified']
+                self.poly_colour = data['poly_colour']
+                self.start_index = data['start_index']
 
         except (OSError) as err:
             print('Error parsing json file. Please check filename.')
@@ -216,8 +227,13 @@ class dataset():
 
             if(self.simplified):
                 if(first):
-                    p = int(self.polygon[0])
-                    q = int(self.polygon[1])
+                    has_target_polygon = np.random.choice([True, False])
+                    if(has_target_polygon):
+                        p = int(self.polygon[0])
+                        q = int(self.polygon[1])
+                    else:
+                        p = -1
+
                     first = False
                 else:
                     p = -1
@@ -281,11 +297,15 @@ class dataset():
                         lines.append([vertices[i % p], vertices[(i + q) % p]]) 
 
                     #connect vertices according to q 
-                    img = cv2.polylines(img, np.int32(lines), isClosed=True, color=(
-                        255-self.background_colour), thickness=1, lineType=cv2.LINE_AA)
+
+                    #if it is the target polygon and a different colour for it is defined
+                    if(self.poly_colour is not None and (p == self.polygon[0] and q == self.polygon[1]) or (p == self.polygon[0] and self.polygon[0] == -1)):
+                            img = cv2.polylines(img, np.int32(lines), isClosed=True, color=(self.poly_colour), thickness=1, lineType=cv2.LINE_AA)
+                    else:
+                        img = cv2.polylines(img, np.int32(lines), isClosed=True, color=(
+                            255-self.background_colour), thickness=1, lineType=cv2.LINE_AA)
                 
                 #create bounding box in xml file if the polygon that was just drawn equals the desired polygon
-              
                 if((p == self.polygon[0] and q == self.polygon[1]) or (p == self.polygon[0] and self.polygon[0] == -1)):
                     bndbox = ET.SubElement(ann, "bndbox"+str(polycount))
                     ET.SubElement(bndbox, "xmin").text = str(x_orig-rad)
@@ -346,7 +366,7 @@ class dataset():
         if(not os.path.exists(self.folder)):
             os.makedirs(self.folder)
             
-        for i in range(self.nr_images):
+        for i in range(self.start_index, self.start_index+self.nr_images):
             img = self.create_image(i, self.folder)
             if(img is None):
                 print('Error creating image.')
@@ -438,7 +458,7 @@ class dataset():
         """
 
         for bndbox in bndboxes:
-            cv2.rectangle(img, bndbox[0], bndbox[1], (0, 255, 0), thickness=1, lineType=cv2.LINE_AA)
+            cv2.rectangle(img, bndbox[0], bndbox[1], (255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
         
         plt.imshow(img)
         plt.show()
@@ -457,4 +477,27 @@ class dataset():
         for i in range(nr_bndboxes):
             bndboxes.append(((int(dict['bndbox'+str(i)]['xmin']), int(dict['bndbox'+str(i)]['ymin'])), (int(dict['bndbox'+str(i)]['xmax']), int(dict['bndbox'+str(i)]['ymax']))))  
         return bndboxes  
+
+    def save(self, filename, dtset):
+        print("Saving dataset to "+filename)
+        try:
+            with open(filename, "wb") as fp:   #Pickling
+                pickle.dump(dtset, fp)
+        except OSError as err:
+            print('Error opening file. Please check filename.')
+            return -1
+
+        print("Dataset sucessfully saved")
+    
+    def load(self, filename):
+        print("Loading dataset from "+filename)
+        try:
+            with open(filename, "rb") as fp:   # Unpickling
+                data = pickle.load(fp)
+        except OSError as err:
+            print('Error opening file. Please check filename.')
+            return -1
+        print("Dataset successfully loaded")
+        return data
+
 
