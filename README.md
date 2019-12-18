@@ -1,19 +1,3 @@
-# xML
-MsC Dissertation on Explanatory Machine (Deep) Learning, specifically CNNs (Convolutional Neural Networks).
+Producing Decisions and Explanations: A Joint Approach Towards Explainable CNNs  
 
-## Installation
-To run the scripts, the following modules need to be installed:
-  * python (3.7.1 was used in the development)
-  * numpy
-  * opencv
-  * matplotlib
-  * os
-  * lxml
-  * json
-  * pickle
-
-## Instructions
-  Running the scripts
-    
-    pyhton example.py
-  
+Rio-Torto I., Fernandes K., Teixeira L.F. (2019) Towards a Joint Approach to Produce Decisions and Explanations Using CNNs. In: Morales A., Fierrez J., Sánchez J., Ribeiro B. (eds) Pattern Recognition and Image Analysis. IbPRIA 2019. Lecture Notes in Computer Science, vol 11867. Springer, Cham
