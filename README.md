@@ -11,9 +11,12 @@
 
 
 ## Results
-![Explanations](https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png)
+![Explanations_imagenetHVZ](https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png)
 
-![Explanations](https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_avgfunction.png)
+![AverageFunction_imagenetHVZ](https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_avgfunction.png)
 
-![Explanations](https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_aopc.png)
+![AOPC_imagenetHVZ](https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_aopc.png)
+
+![Explanations_cervix](https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png)
+
 
