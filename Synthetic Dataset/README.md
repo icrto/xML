@@ -37,6 +37,9 @@ For each generated image, annotations are created in Pascal VOC format, containi
   
  ## Examples
  ![example0](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example.png)
+ img[src~="example"] {
+   border: 1px solid black;
+ }
  ![example1](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example1.png)
  ![example2](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example2.png)
  ![example3](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example3.png)
