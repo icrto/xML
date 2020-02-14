@@ -34,4 +34,10 @@ For each generated image, annotations are created in Pascal VOC format, containi
 ## To Implement
   * annotations for intersection of polygons
   * application of textures to the generated images
-    
+  
+ ## Examples
+ ![example0](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example.png)
+ ![example1](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example1.png)
+ ![example2](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example2.png)
+ ![example3](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example3.png)
+ ![example4](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example4.png)
