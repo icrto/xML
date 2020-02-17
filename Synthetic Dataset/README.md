@@ -36,5 +36,4 @@ For each generated image, annotations are created in Pascal VOC format, containi
   * application of textures to the generated images
   
  ## Examples
- ![examples](https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/examples.png)
-
+ <img src="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/examples.png" width="1000">
