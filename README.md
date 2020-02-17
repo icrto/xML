@@ -19,8 +19,6 @@
 
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png" width=1420 height=400>
 
-<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png">
-
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_avgfunction.png">
 
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_aopc.png">
