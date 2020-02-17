@@ -16,13 +16,16 @@
 
 ## Results
 ### ImagenetHVZ
-![Explanations_imagenetHVZ](https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png)
 
-![AverageFunction_imagenetHVZ](https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_avgfunction.png)
+<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png" width=1420 height=400>
 
-![AOPC_imagenetHVZ](https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_aopc.png)
+<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png">
+
+<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_avgfunction.png">
+
+<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_aopc.png">
 
 ### NIH-NCI Cervical Cancer
-![Explanations_cervix](https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png)
+<img align="center" width=1420 height=400 src="https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png">
 
 
