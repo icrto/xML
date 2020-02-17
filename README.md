@@ -3,7 +3,7 @@
 ## Intro
 
 ## Architecture
-![Architecture](https://github.com/icrto/xML/blob/master/example_images/architecture.png)
+<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/architecture.png">
 
 
 ## Requirements
