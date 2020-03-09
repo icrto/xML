@@ -2,6 +2,8 @@
 
 ## Intro
 
+## Contents
+
 ## Architecture
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/architecture.png">
 
@@ -25,6 +27,11 @@
 
 
 ## Requirements
+
+## Training
+
+### 3 Phase Process
+### Hyperparameters
 
 ## Example Usage
 
