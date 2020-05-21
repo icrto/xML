@@ -1,5 +1,11 @@
 # Understanding the decisions of CNNs: an in-model approach
 
+This is the official implementation of the paper [Understanding the decisions of CNNs: an in-model approach](https://doi.org/10.1016/j.patrec.2020.04.004). 
+
+If you use this repository, please cite
+
+> I. Rio-Torto, K. Fernandes, and L. F. Teixeira, “Understanding the decisions of CNNs: An in-model approach,” Pattern Recognition Letters, vol. 133, no. C, pp. 373–380, Apr. 2020, doi: 10.1016/j.patrec.2020.04.004.
+
 ## Intro
 
 ## Contents
