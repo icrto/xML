@@ -8,9 +8,9 @@ If you use this repository, please cite
 
 ## Contents
 
-[***Architecture***](https://github.com/icrto/xML##Architecture)
+[***Architecture***](https://github.com/icrto/xML#Architecture)
 
-[***Joint Loss***](https://github.com/icrto/xML##JointLoss)
+[***Joint Loss***](<https://github.com/icrto/xML#Joint Loss>)
 
 
 ## Architecture
