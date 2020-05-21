@@ -40,6 +40,9 @@ class EarlyStopping:
                             Default: False
             delta (float): Minimum change in the monitored quantity to qualify as an improvement.
                             Default: 0
+            folder (str): Directory where model will be stored.
+
+            timestamp (str): Timestamp to append before model name.
         """
         self.patience = patience
         self.verbose = verbose
