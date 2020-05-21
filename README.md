@@ -37,7 +37,7 @@ Some preliminary work was published in:
 ## Architecture
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/architecture.png">
 
-## <Loss>
+## Loss
 ![JointLoss](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D%20%3D%20%5Calpha%20%5Cmathcal%7BL%7D_%7Bclass%7D%20&plus;%20%281%20-%20%5Calpha%29%20%5Cmathcal%7BL%7D_%7Bexpl%7D)
 
 ### Unsupervised Explanation Loss
