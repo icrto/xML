@@ -27,13 +27,8 @@ Some preliminary work was published in:
 
 ```
 @InProceedings{
-  author = {Rio-Torto, Isabel
-  and Fernandes, Kelwin
-  and Teixeira, Luís F.},
-  editor = {Morales, Aythami
-  and Fierrez, Julian
-  and Sánchez, José Salvador
-  and Ribeiro, Bernardete},
+  author = {Rio-Torto, Isabel and Fernandes, Kelwin and Teixeira, Luís F.},
+  editor = {Morales, Aythami and Fierrez, Julian and Sánchez, José Salvador and Ribeiro, Bernardete},
   title = {Towards a Joint Approach to Produce Decisions and Explanations Using CNNs},
   booktitle = {Pattern Recognition and Image Analysis},
   year = {2019},
