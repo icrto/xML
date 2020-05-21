@@ -6,9 +6,12 @@ If you use this repository, please cite
 
 > I. Rio-Torto, K. Fernandes, and L. F. Teixeira, “Understanding the decisions of CNNs: An in-model approach,” Pattern Recognition Letters, vol. 133, no. C, pp. 373–380, Apr. 2020, doi: 10.1016/j.patrec.2020.04.004.
 
-## Intro
-
 ## Contents
+
+[***Architecture***](https://github.com/icrto/xML##Architecture)
+
+[***Joint Loss***](https://github.com/icrto/xML##JointLoss)
+
 
 ## Architecture
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/architecture.png">
