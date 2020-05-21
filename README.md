@@ -6,11 +6,43 @@ It also includes my master thesis "Producing Decisions and Explanations: A Joint
 
 If you use this repository, please cite:
 
-> I. Rio-Torto, K. Fernandes, and L. F. Teixeira, “Understanding the decisions of CNNs: An in-model approach,” Pattern Recognition Letters, vol. 133, no. C, pp. 373–380, Apr. 2020, doi: 10.1016/j.patrec.2020.04.004.
+```
+
+@article{
+  author = {Rio-Torto, Isabel and Fernandes, Kelwin and Teixeira, Luís F}
+  doi = {10.1016/j.patrec.2020.04.004},
+  issn = {01678655},
+  journal = {Pattern Recognition Letters},
+  month = {apr},
+  number = {C},
+  pages = {373--380},
+  title = {{Understanding the decisions of CNNs: An in-model approach}},
+  url = {http://www.sciencedirect.com/science/article/pii/S0167865520301240}
+  volume = {133},
+  year = {2020}
+}
+```
 
 Some preliminary work was published in:
 
-> Rio-Torto I., Fernandes K., Teixeira L.F. (2019) Towards a Joint Approach to Produce Decisions and Explanations Using CNNs. In: Morales A., Fierrez J., Sánchez J., Ribeiro B. (eds) Pattern Recognition and Image Analysis. IbPRIA 2019. Lecture Notes in Computer Science, vol 11867. Springer, Cham
+```
+@InProceedings{
+  author = {Rio-Torto, Isabel
+  and Fernandes, Kelwin
+  and Teixeira, Luís F.},
+  editor = {Morales, Aythami
+  and Fierrez, Julian
+  and Sánchez, José Salvador
+  and Ribeiro, Bernardete},
+  title = {Towards a Joint Approach to Produce Decisions and Explanations Using CNNs},
+  booktitle = {Pattern Recognition and Image Analysis},
+  year = {2019},
+  publisher = {Springer International Publishing},
+  pages = {"3--15"},
+  url = {https://link.springer.com/chapter/10.1007/978-3-030-31332-6_1},
+ }
+```
+
 
 ## Contents
 
