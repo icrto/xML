@@ -38,7 +38,7 @@ Some preliminary work was published in:
  }
 ```
 
-IMPORTANT: the Keras version is currently not up-to-date with the most recent PyTorch version!
+**IMPORTANT: the Keras version is currently not up-to-date with the most recent PyTorch version!**
 
 ## Contents
 
