@@ -110,3 +110,4 @@ Some preliminary work was published in:
 ## TODO
 - [ ] update keras version
 - [ ] results on imagenet16
+- [ ] update synthetic dataset generation script
