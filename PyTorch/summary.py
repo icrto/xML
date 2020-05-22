@@ -1,6 +1,11 @@
+"""
+Adapted from https://github.com/sksq96/pytorch-summary.git.
+(Instead of printing a summary to stdout, it writes the summary to a txt file given by <filename>.)
+
+"""
+
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 
 from collections import OrderedDict
 import numpy as np
@@ -77,7 +82,8 @@ def summary(model, input_size, filename, batch_size=-1, device="cuda"):
 
     with open(filename, "w") as f:
         print("----------------------------------------------------------------", file=f)
-        line_new = "{:>20}  {:>25} {:>15}".format("Layer (type)", "Output Shape", "Param #")
+        line_new = "{:>20}  {:>25} {:>15}".format(
+            "Layer (type)", "Output Shape", "Param #")
         print(line_new, file=f)
         print("================================================================", file=f)
         total_params = 0
@@ -98,19 +104,22 @@ def summary(model, input_size, filename, batch_size=-1, device="cuda"):
             print(line_new, file=f)
 
         # assume 4 bytes/number (float on cuda).
-        total_input_size = abs(np.prod(input_size) * batch_size * 4. / (1024 ** 2.))
-        total_output_size = abs(2. * total_output * 4. / (1024 ** 2.))  # x2 for gradients
+        total_input_size = abs(np.prod(input_size) *
+                               batch_size * 4. / (1024 ** 2.))
+        total_output_size = abs(
+            2. * total_output * 4. / (1024 ** 2.))  # x2 for gradients
         total_params_size = abs(total_params.numpy() * 4. / (1024 ** 2.))
         total_size = total_params_size + total_output_size + total_input_size
 
         print("================================================================", file=f)
         print("Total params: {0:,}".format(total_params), file=f)
         print("Trainable params: {0:,}".format(trainable_params), file=f)
-        print("Non-trainable params: {0:,}".format(total_params - trainable_params), file=f)
+        print(
+            "Non-trainable params: {0:,}".format(total_params - trainable_params), file=f)
         print("----------------------------------------------------------------", file=f)
         print("Input size (MB): %0.2f" % total_input_size, file=f)
-        print("Forward/backward pass size (MB): %0.2f" % total_output_size, file=f)
+        print("Forward/backward pass size (MB): %0.2f" %
+              total_output_size, file=f)
         print("Params size (MB): %0.2f" % total_params_size, file=f)
         print("Estimated Total Size (MB): %0.2f" % total_size, file=f)
         print("----------------------------------------------------------------", file=f)
-    # return summary

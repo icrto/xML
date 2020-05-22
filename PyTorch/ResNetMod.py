@@ -1,3 +1,6 @@
+"""
+Adapted from https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py.
+"""
 import torch
 import torch.nn as nn
 try:
@@ -6,8 +9,7 @@ except ImportError:
     from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
-           'resnet152', 'resnext50_32x4d', 'resnext101_32x8d',
-           'wide_resnet50_2', 'wide_resnet101_2']
+           'resnet152']
 
 import sys
 
@@ -16,11 +18,7 @@ model_urls = {
     'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
     'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
     'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
-    'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
-    'resnext50_32x4d': 'https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth',
-    'resnext101_32x8d': 'https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth',
-    'wide_resnet50_2': 'https://download.pytorch.org/models/wide_resnet50_2-95faca4d.pth',
-    'wide_resnet101_2': 'https://download.pytorch.org/models/wide_resnet101_2-32ee1156.pth',
+    'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth'
 }
 
 
@@ -34,6 +32,7 @@ def conv1x1(in_planes, out_planes, stride=1):
     """1x1 convolution"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
+
 class BasicBlock(nn.Module):
     expansion = 1
     __constants__ = ['downsample']
@@ -44,9 +43,11 @@ class BasicBlock(nn.Module):
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         if groups != 1 or base_width != 64:
-            raise ValueError('BasicBlock only supports groups=1 and base_width=64')
+            raise ValueError(
+                'BasicBlock only supports groups=1 and base_width=64')
         if dilation > 1:
-            raise NotImplementedError("Dilation > 1 not supported in BasicBlock")
+            raise NotImplementedError(
+                "Dilation > 1 not supported in BasicBlock")
         # Both self.conv1 and self.downsample layers downsample the input when stride != 1
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = norm_layer(planes)
@@ -73,8 +74,10 @@ class BasicBlock(nn.Module):
         out += identity
         out = self.relu(out)
 
-        out = torch.mul(out, torch.cat([expl] * (self.planes * self.expansion), dim=1))
+        out = torch.mul(out, torch.cat(
+            [expl] * (self.planes * self.expansion), dim=1))  # connection between explainer and classifier
         return out
+
 
 class Bottleneck(nn.Module):
     expansion = 4
@@ -93,7 +96,7 @@ class Bottleneck(nn.Module):
         self.bn2 = norm_layer(width)
         self.conv3 = conv1x1(width, planes * self.expansion)
         self.bn3 = norm_layer(planes * self.expansion)
-        self.relu = nn.ReLU(inplace=True)        
+        self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
         self.planes = planes
@@ -118,20 +121,24 @@ class Bottleneck(nn.Module):
         out += identity
         out = self.relu(out)
 
-        out = torch.mul(out, torch.cat([expl] * (self.planes * self.expansion), dim=1))
+        out = torch.mul(out, torch.cat(
+            [expl] * (self.planes * self.expansion), dim=1))  # connection between explainer and classifier
         return out
+
 
 class SuperBlock(nn.Module):
     def __init__(self, blocks):
         super(SuperBlock, self).__init__()
         for id_, block in enumerate(blocks):
             self.add_module('block' + str(id_), block)
-        
+
     def forward(self, x, expl):
         for block in self.children():
+            # now SuperBlock needs the explanation as input as well
             x = block(x, expl)
-        
+
         return x
+
 
 class ResNet(nn.Module):
 
@@ -142,7 +149,6 @@ class ResNet(nn.Module):
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
-
         self.inplanes = 64
         self.dilation = 1
         if replace_stride_with_dilation is None:
@@ -159,24 +165,25 @@ class ResNet(nn.Module):
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.expl_maxpool4 = nn.MaxPool2d(kernel_size=4)
-        self.expl_maxpool2 = nn.MaxPool2d(kernel_size=2)
+
+        # explanations are downsampled using average pooling --> see paper for details
+        self.expl_avgpool4 = nn.AvgPool2d(kernel_size=4)
+        self.expl_avgpool2 = nn.AvgPool2d(kernel_size=2)
+
         self.sb1 = self._make_layer(block, 64, layers[0])
         self.sb2 = self._make_layer(block, 128, layers[1], stride=2,
-                                       dilate=replace_stride_with_dilation[0])
+                                    dilate=replace_stride_with_dilation[0])
         self.sb3 = self._make_layer(block, 256, layers[2], stride=2,
-                                       dilate=replace_stride_with_dilation[1])
+                                    dilate=replace_stride_with_dilation[1])
         self.sb4 = self._make_layer(block, 512, layers[3], stride=2,
-                                       dilate=replace_stride_with_dilation[2])
-        self.avgpool = nn.AvgPool2d(kernel_size=(7,7))
-        #self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+                                    dilate=replace_stride_with_dilation[2])
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(512 * block.expansion, num_classes)
-        #self.softmax = nn.LogSoftmax(dim=1)
-
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                nn.init.kaiming_normal_(
+                    m.weight, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
@@ -213,26 +220,30 @@ class ResNet(nn.Module):
         return SuperBlock(layers)
 
     def _forward_impl(self, x, expl):
-        # See note [TorchScript super()]
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
-        expl = self.expl_maxpool4(expl)
+
+        expl = self.expl_avgpool4(expl)
+
+        # connection between explainer and classifier
         x = torch.mul(x, torch.cat([expl] * 64, dim=1))
 
-        x = self.sb1(x, expl) 
-        expl = self.expl_maxpool2(expl)       
+        x = self.sb1(x, expl)
+        expl = self.expl_avgpool2(expl)
+
         x = self.sb2(x, expl)
-        expl = self.expl_maxpool2(expl)   
+        expl = self.expl_avgpool2(expl)
+
         x = self.sb3(x, expl)
-        expl = self.expl_maxpool2(expl)   
+        expl = self.expl_avgpool2(expl)
+
         x = self.sb4(x, expl)
 
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.fc(x)
-        #x = self.softmax(x)
 
         return x
 
@@ -250,6 +261,28 @@ def _resnet(arch, block, layers, pretrained, progress, **kwargs):
     return model
 
 
+def resnet18(pretrained=False, progress=True, **kwargs):
+    r"""ResNet-18 model from
+    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    return _resnet('resnet18', BasicBlock, [2, 2, 2, 2], pretrained=pretrained, progress=progress,
+                   **kwargs)
+
+
+def resnet34(pretrained=False, progress=True, **kwargs):
+    r"""ResNet-34 model from
+    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    return _resnet('resnet34', BasicBlock, [3, 4, 6, 3], pretrained=pretrained, progress=progress,
+                   **kwargs)
+
+
 def resnet50(pretrained=False, progress=True, **kwargs):
     r"""ResNet-50 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_
@@ -262,22 +295,23 @@ def resnet50(pretrained=False, progress=True, **kwargs):
                    **kwargs)
 
 
-def resnet18(pretrained=False, progress=True, **kwargs):
-    r"""ResNet-18 model from
+def resnet101(pretrained=False, progress=True, **kwargs):
+    r"""ResNet-101 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _resnet('resnet18', BasicBlock, [2, 2, 2, 2], pretrained=pretrained, progress=progress,
+    return _resnet('resnet101', Bottleneck, [3, 4, 23, 3], pretrained, progress,
                    **kwargs)
 
-def resnet34(pretrained=False, progress=True, **kwargs):
-    r"""ResNet-34 model from
+
+def resnet152(pretrained=False, progress=True, **kwargs):
+    r"""ResNet-152 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _resnet('resnet34', BasicBlock, [3, 4, 6, 3], pretrained=pretrained, progress=progress,
+    return _resnet('resnet152', Bottleneck, [3, 8, 36, 3], pretrained, progress,
                    **kwargs)
