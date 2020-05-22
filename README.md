@@ -89,6 +89,17 @@ Some preliminary work was published in:
 
 ## Implementation
 
+- ConvMod.py
+- Dataset.py
+- Explainer.py
+- ExplainerClassifierCNN.py
+- Losses.py
+- ResNetMod.py
+- test.py
+- train.py
+- utils.py
+- VGG.py
+
 ## Training
 
 ### 3 Phase Process
@@ -134,7 +145,7 @@ Neural network artwork → [PlotNeuralNet](https://github.com/HarisIqbal88/PlotN
 
 Data augmentation → [albumentations](https://github.com/albumentations-team/albumentations)
 
-Early Stopping → [early-stopping-pytorch](https://github.com/Bjarten/early-stopping-pytorch.git)
+Early stopping → [early-stopping-pytorch](https://github.com/Bjarten/early-stopping-pytorch.git)
 
 Network summary → [pytorch-summary](https://github.com/sksq96/pytorch-summary.git)
 
