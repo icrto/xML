@@ -117,7 +117,7 @@ For the PyTorch version please consult [requirements_pytorch.txt](https://github
 
 Neural network artwork → [PlotNeuralNet](https://github.com/HarisIqbal88/PlotNeuralNet)
 
-### PyTorch Version
+#### PyTorch Version
 
 Data augmentation → [albumentations](https://github.com/albumentations-team/albumentations)
 
@@ -129,7 +129,7 @@ Other interpretability methods → [captum](https://captum.ai)
 
 Deep Taylor Decomposition → [Deep-Taylor-Decomposition](https://github.com/myc159/Deep-Taylor-Decomposition)
 
-### Keras Version
+#### Keras Version
 
 Other interpretability methods → [innvestigate](https://github.com/albermax/innvestigate)
 
