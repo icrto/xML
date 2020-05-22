@@ -2,8 +2,7 @@ from torch import nn
 
 
 class ConvMod(nn.Module):
-    """
-        Class ConvMod (used in Explainer and VGG).
+    """ Class ConvMod (used in Explainer and VGG).
         Consists in two conv-relu stages.
     """
 
