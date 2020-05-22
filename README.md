@@ -13,7 +13,7 @@ If you use this repository, please cite:
   doi = {10.1016/j.patrec.2020.04.004},
   issn = {01678655},
   journal = {Pattern Recognition Letters},
-  month = {apr},
+  month = {may},
   number = {C},
   pages = {373--380},
   title = {{Understanding the decisions of CNNs: An in-model approach}},
