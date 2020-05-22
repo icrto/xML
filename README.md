@@ -47,15 +47,18 @@ Some preliminary work was published in:
 
 [***Metrics***](https://github.com/icrto/xML#Metrics)
 
-[***Requirements***](https://github.com/icrto/xML#Requirements)
-
 [***Implementation***](https://github.com/icrto/xML#Implementation)
 
 [***Training***](https://github.com/icrto/xML#Training)
 
+[***Results***](https://github.com/icrto/xML#Results)
+
+[***Requirements***](https://github.com/icrto/xML#Requirements)
+
 [***Usage***](https://github.com/icrto/xML#Usage)
 
-[***Results***](https://github.com/icrto/xML#Results)
+[***Credits***](https://github.com/icrto/xML#Credits)
+
 
 [***TODO***](https://github.com/icrto/xML#TODO)
 
@@ -83,16 +86,12 @@ Some preliminary work was published in:
 ![POMPOM](https://latex.codecogs.com/gif.latex?POMPOM%20%3D%20%5Cleft%7C%5Cfrac%7B%5Csum%5Climits_%7Bi%2Cj%7D%5E%7B%20%7D%5B%281-z_%7Bi%2Cj%7D%29%20%5Chat%7Bz%7D_%7Bi%2Cj%7D%5D%20%3E%20%5Cepsilon%7D%7B%5Csum%5Climits_%7Bi%2Cj%7D%5E%7B%20%7D%5B%281-z_%7Bi%2Cj%7D%29%5D%20%3E%20%5Cepsilon%20&plus;%20%5Cepsilon%7D%5Cright%7C)
 
 
-## Requirements
-
 ## Implementation
 
 ## Training
 
 ### 3 Phase Process
 ### Hyperparameters
-
-## Usage
 
 
 ## Results
@@ -106,6 +105,12 @@ Some preliminary work was published in:
 
 ### NIH-NCI Cervical Cancer
 <img align="center" width=1420 height=400 src="https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png">
+
+## Requirements
+
+## Usage
+
+## Credits
 
 ## TODO
 - [ ] update keras version
