@@ -57,7 +57,7 @@ Some preliminary work was published in:
 
 [***Results***](https://github.com/icrto/xML#Results)
 
-
+[***TODO***](https://github.com/icrto/xML#TODO)
 
 
 
@@ -107,4 +107,6 @@ Some preliminary work was published in:
 ### NIH-NCI Cervical Cancer
 <img align="center" width=1420 height=400 src="https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png">
 
-
+## TODO
+- [ ] update keras version
+- [ ] results on imagenet16
