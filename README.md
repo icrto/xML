@@ -122,7 +122,7 @@ Some preliminary work was published in:
 
 For the PyTorch version please consult [requirements_pytorch.txt](https://github.com/icrto/xML/blob/master/requirements_pytorch.txt). 
 
-I'm using PyTorch 1.3.1 and Keras 2.2.4 in Python 3.6.9.
+I'm using `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
 
 ## Usage
 
