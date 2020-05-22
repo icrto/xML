@@ -115,6 +115,26 @@ For the PyTorch version please consult [requirements_pytorch.txt](https://github
 
 ## Credits
 
+Neural network artwork → [PlotNeuralNet] (https://github.com/HarisIqbal88/PlotNeuralNet)
+
+### PyTorch Version
+
+Data augmentation → [albumentations] (https://github.com/albumentations-team/albumentations)
+
+Early Stopping → [early-stopping-pytorch] (https://github.com/Bjarten/early-stopping-pytorch.git)
+
+Network summary → [pytorch-summary] (https://github.com/sksq96/pytorch-summary.git)
+
+Other interpretability methods → [captum] (https://captum.ai)
+
+Deep Taylor Decomposition → [Deep-Taylor-Decomposition] (https://github.com/myc159/Deep-Taylor-Decomposition)
+
+### Keras Version
+
+Other interpretability methods → [innvestigate] (https://github.com/albermax/innvestigate)
+
+
+
 ## TODO
 - [ ] update keras version
 - [ ] results on imagenet16
