@@ -56,6 +56,8 @@ IMPORTANT: the Keras version is currently not up-to-date with the most recent Py
 
 [***Requirements***](https://github.com/icrto/xML#Requirements)
 
+For the PyTorch version please consult [requirements_pytorch.txt](https://github.com/icrto/xML/blob/master/requirements_pytorch.txt)
+
 [***Usage***](https://github.com/icrto/xML#Usage)
 
 [***Credits***](https://github.com/icrto/xML#Credits)
