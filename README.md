@@ -116,13 +116,13 @@ For the PyTorch version please consult [requirements_pytorch.txt](https://github
 Train
 
 ```
-python3 train.py imagenetHVZ --nr_epochs 10,10,60 -bs 8 --init_bias 3.0 --loss hybrid --alpha 1.0,0.25,0.9 --beta 0.9 --gamma 1.0 -lr_clf 0.01,0,0.01 -lr_expl 0,0.01,0.01 --aug_prob 0.2 --opt sgd -clf resnet50 --early_patience 100,100,10 --folder /media/TOSHIBA6T/ICRTO/results/
+python3 train.py imagenetHVZ --nr_epochs 10,10,60 -bs 8 --init_bias 3.0 --loss hybrid --alpha 1.0,0.25,0.9 --beta 0.9 --gamma 1.0 -lr_clf 0.01,0,0.01 -lr_expl 0,0.01,0.01 --aug_prob 0.2 --opt sgd -clf resnet50 --early_patience 100,100,10 --folder <path_to_destination_folder>
 ```
 
 Test
 
 ```
-python3 test.py /media/TOSHIBA6T/ICRTO/results/2020-05-22_22-25-36/2020-05-22_22-25-36_phase2_best_loss.pt imagenetHVZ 0.9 -bs 8 -clf resnet50 --init_bias 3.0 --loss hybrid --beta 0.9 --gamma 1.0
+python3 test.py <path_to_model> imagenetHVZ 0.9 -bs 8 -clf resnet50 --init_bias 3.0 --loss hybrid --beta 0.9 --gamma 1.0
 ```
 
 
