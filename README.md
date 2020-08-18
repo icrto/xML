@@ -168,17 +168,18 @@ We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area 
 
 
 ## Implementation
-
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/ConvMod.py">ConvMod.py</a> - contains the ConvMod class (used in both Explainer.py and VGG.py), that implements a conv-relu-conv-relu module. 
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py">Dataset.py</a> - provides the Dataset class, necessary to create a PyTorch dataloader. The getitem function is responsible for randomly sampling an image from the corresponding dataframe (previously obtained with the load_data function), with its respective label and mask. The mask is only obtained if the variable masks is set to True, which might only be needed in case you want to apply the hybrid loss.
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/Explainer.py">Explainer.py</a> - defines the Explainer architecture as an encoder-decoder (see paper and/or source code for a more detailed description of the module).
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/ExplainerClassifierCNN.py">ExplainerClassifierCNN.py</a> - contains the implementation of the joint architecture. It instantiates the explainer and a classifier (chosen from a list of resnet models or our VGG-based implementation).
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/Losses.py">Losses.py</a>
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/ResNetMod.py">ResNetMod.py</a> - defines one alternative for the Classifier architecture as a modified version of the ResNet network (see paper and/or source code for a more detailed description of the module). The original ResNet source code (from torchvision) is modified to include the multiplication layers and connections between explainer and classifier.
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py">test.py</a>
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a>
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/utils.py">utils.py</a> - contains auxiliary functions, such as image normalization, freezing and unfreezing of model layers and plotting functions (for plotting metrics and losses' values during training/validation and roc/precision-recall curves).
-- <a href="https://github.com/icrto/xML/blob/master/PyTorch/VGG.py">VGG.py</a> - defines one alternative for the Classifier architecture as a version of the VGG16 network (see paper and/or source code for a more detailed description of the module). The original VGG16 is modified to include the multiplication layers and connections between explainer and classifier.
+<ul>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/ConvMod.py">ConvMod.py</a> - contains the ConvMod class (used in both Explainer.py and VGG.py), that implements a conv-relu-conv-relu module.</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py">Dataset.py</a> - provides the Dataset class, necessary to create a PyTorch dataloader. The getitem function is responsible for randomly sampling an image from the corresponding dataframe (previously obtained with the load_data function), with its respective label and mask. The mask is only obtained if the variable masks is set to True, which might only be needed in case you want to apply the hybrid loss.</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/Explainer.py">Explainer.py</a> - defines the Explainer architecture as an encoder-decoder (see paper and/or source code for a more detailed description of the module).</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/ExplainerClassifierCNN.py">ExplainerClassifierCNN.py</a> - contains the implementation of the joint architecture. It instantiates the explainer and a classifier (chosen from a list of resnet models or our VGG-based implementation).</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/Losses.py">Losses.py</a></p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/ResNetMod.py">ResNetMod.py</a> - defines one alternative for the Classifier architecture as a modified version of the ResNet network (see paper and/or source code for a more detailed description of the module). The original ResNet source code (from torchvision) is modified to include the multiplication layers and connections between explainer and classifier.</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py">test.py</a></p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a></p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/utils.py">utils.py</a> - contains auxiliary functions, such as image normalization, freezing and unfreezing of model layers and plotting functions (for plotting metrics and losses' values during training/validation and roc/precision-recall curves).</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/VGG.py">VGG.py</a> - defines one alternative for the Classifier architecture as a version of the VGG16 network (see paper and/or source code for a more detailed description of the module). The original VGG16 is modified to include the multiplication layers and connections between explainer and classifier.</p></li>
+ </ul>
 
 ## Training
 
