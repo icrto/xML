@@ -1,7 +1,7 @@
 # Understanding the decisions of CNNs: an in-model approach
-<p align="justify">
 This is the official implementation of the paper [Understanding the decisions of CNNs: an in-model approach](https://doi.org/10.1016/j.patrec.2020.04.004). 
 
+<p align="justify">
 It also includes my master thesis "Producing Decisions and Explanations: A Joint Approach Towards Explainable CNNs" (full document and final presentation), in which the paper was based and further extended.
 
 If you use this repository, please cite:
