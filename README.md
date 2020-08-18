@@ -211,6 +211,7 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 <p align="center">
 <img width=1420 height=400 src="https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png">
 </p>
+
 ## Requirements
 
 For the PyTorch version please consult [requirements_pytorch.txt](https://github.com/icrto/xML/blob/master/requirements_pytorch.txt). 
@@ -261,4 +262,6 @@ Other interpretability methods → [innvestigate](https://github.com/albermax/in
 
 ## Contact Info
 
+<p align="justify">
 If you wish to know more about this project, do not hesitate to contact me at icrtto@gmail.com or to open an issue.
+</p>
