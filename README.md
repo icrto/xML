@@ -132,10 +132,26 @@ However, we argue that interpretability should be taken into account from the st
 
 ## Metrics
 
-<a href="https://www.sciencedirect.com/science/article/pii/S1051200417302385">Methods for interpreting and understanding deep neural networks</a>
+<p align="justify">
+  Defining what a "good" explanation is and how to <b>measure</b> and compare <b>explanations</b> is still an <b>open problem</b> in this research field. A valid explanation for a certain person, might not be acceptable or understandable to another person. In fact, explanations are context-, audience/user- and domain-dependent, which makes it harder to define quantitative metrics.
+  
+Montavon et. al proposed a <b>perturbation process to assess explanation quality</b>. This process is explained in <a href="https://www.sciencedirect.com/science/article/pii/S1051200417302385">Methods for interpreting and understanding deep neural networks</a> and a representative picture taken from that paper is found below.
+<p>
+
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/perturbation_process.png">
 
+<p align="justify">
+The perturbation process can be described as follows: we start by first dividing the heatmaps (produced by some interpretability method under assessment) into a predifined <b>grid</b>. Afterwards, for each patch/tile of this grid we compute the average pixel values, so that patches with higher relevance (as indicated by the heatmap) give higher values. The next step is <b>sorting</b> these patches in <b>descending order</b> according to these previously computed values. Then, starting from the patch with higher heatmap relevance, we perturb that area in the original image and forward that perturbed image through our classification network, obtaining the output value (f(x) - softmax probability for the positive class, for example). Finally, we repeat this process, but this time adding to the initial perturbation the next most relevant patch, and so on until the whole image is perturbed or a certain number of perturbation steps is reached.
+
+The intuition is that, <b>the more relevant the patch, the more it will affect (decrease) the classification output</b>, so we expect a steeper decrease in f(x) in the initial stages of the perturbation process and a lower slope of the curve from there onwards. This curve is called the <b>MoRF (Most Relevant First) curve</b>. 
+
+We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area Over the MoRF Curve</b>, averaged over the entire test set. Conversely to what is expected with the MoRF curve, the AOPC curve should have a somewhat logarithmic behaviour, since as we add less relevant patches, they will have a small influence in f(x), which is ideally already presenting small values, which leads to the addition of a small area to the cumulative area given by AOPC.
+</p>
+
 ![AOPC](https://latex.codecogs.com/gif.latex?AOPC%20%3D%20%5Cfrac%7B1%7D%7BL%20&plus;%201%7D%5Cbigg%5Clangle%5Csum%5Climits_%7Bk%3D0%7D%5E%7BL%7D%20f%28x_%7BMoRF%7D%5E%7B%280%29%7D%29%20-%20f%28x_%7BMoRF%7D%5E%7B%28k%29%7D%29%5Cbigg%5Crangle_%7Bp%28x%29%7D)
+<p align="justify">
+  To compare between our unsupervised and hybrid approaches, we propose another evaluation metric, <b>POMPOM (Percentage of Meaningful Pixels Outside the Mask)</b>. For a single instance, it is defined as the number of meaningful pixels outside the region of interest (as given by a "ground-truth" weak annotation mask) in relation to its total number of pixels. We only consider meaningful pixels, i.e pixel values higher than ε. Therefore, POMPOM admits values in [0, 1], going from black to white images, respectively. <b>The lower the POMPOM value</b> for the entire test set, <b>the better</b> the produced explanations, since they have less pixels outside our regions of interest.
+</p>
 
 ![POMPOM](https://latex.codecogs.com/gif.latex?POMPOM%20%3D%20%5Cleft%7C%5Cfrac%7B%5Csum%5Climits_%7Bi%2Cj%7D%5E%7B%20%7D%5B%281-z_%7Bi%2Cj%7D%29%20%5Chat%7Bz%7D_%7Bi%2Cj%7D%5D%20%3E%20%5Cepsilon%7D%7B%5Csum%5Climits_%7Bi%2Cj%7D%5E%7B%20%7D%5B%281-z_%7Bi%2Cj%7D%29%5D%20%3E%20%5Cepsilon%20&plus;%20%5Cepsilon%7D%5Cright%7C)
 
@@ -216,8 +232,8 @@ Other interpretability methods → [innvestigate](https://github.com/albermax/in
 
 ## TODO
 - [ ] update keras version
-- [ ] results on imagenet16
 - [ ] update synthetic dataset generation script
+- [ ] upload synthetic data
 
 ## Contact Info
 
