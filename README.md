@@ -198,3 +198,7 @@ Other interpretability methods → [innvestigate](https://github.com/albermax/in
 - [ ] update keras version
 - [ ] results on imagenet16
 - [ ] update synthetic dataset generation script
+
+## Contact Info
+
+If you wish to know more about this project, do not hesitate to contact me at icrtto@gmail.com or to open an issue.
