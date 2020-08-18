@@ -1,10 +1,11 @@
 # Understanding the decisions of CNNs: an in-model approach
-
+<p align="justify">
 This is the official implementation of the paper [Understanding the decisions of CNNs: an in-model approach](https://doi.org/10.1016/j.patrec.2020.04.004). 
 
 It also includes my master thesis "Producing Decisions and Explanations: A Joint Approach Towards Explainable CNNs" (full document and final presentation), in which the paper was based and further extended.
 
 If you use this repository, please cite:
+</p>
 
 ```
 
@@ -66,6 +67,12 @@ Some preliminary work was published in:
 
 
 ## Architecture
+<p align="justify">
+  With the advent of Deep Learning, in particular Convolutional Neural Networks, there is also a growing demand for Interpretability/Explainability of these highly complex and abstract models. Several interpretability methods have already been proposed, and these are for the most part post-model methods, i.e. methods applied after the main (classification) model is trained.
+
+However, we argue that interpretability should be taken into account from the start, being a design requirement and a desirable property of the system. As such, we propose an in-model approach, i.e. an interpretability method applied during training of the main model.  
+</p>
+
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/architecture.png">
 
 ## Loss
