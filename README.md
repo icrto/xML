@@ -149,7 +149,7 @@ The intuition is that, <b>the more relevant the patch, the more it will affect (
 </p>
 
 <p align="justify">
-We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area Over the MoRF Curve</b>, averaged over the entire test set. Conversely to what is expected with the MoRF curve, the AOPC curve should have a somewhat logarithmic behaviour, since as we add less relevant patches, they will have a small influence in f(x), which is ideally already presenting small values, which leads to the addition of a small area to the cumulative area given by AOPC.
+We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area Over the MoRF Curve</b>, averaged over the entire test set. Conversely to what is expected with the MoRF curve, the AOPC curve should have a somewhat logarithmic behaviour, since as we add less relevant patches, they will have a small influence in f(x) (that is ideally already presenting small values). This leads to the addition of a small area to the cumulative area given by AOPC.
 </p>
 
 ![AOPC](https://latex.codecogs.com/gif.latex?AOPC%20%3D%20%5Cfrac%7B1%7D%7BL%20&plus;%201%7D%5Cbigg%5Clangle%5Csum%5Climits_%7Bk%3D0%7D%5E%7BL%7D%20f%28x_%7BMoRF%7D%5E%7B%280%29%7D%29%20-%20f%28x_%7BMoRF%7D%5E%7B%28k%29%7D%29%5Cbigg%5Crangle_%7Bp%28x%29%7D)
