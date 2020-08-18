@@ -362,7 +362,7 @@ def load_data(folder, dataset='imagenetHVZ', masks=False, class_weights=None):
 
     Keyword Arguments:
         dataset {str} -- dataset to choose (default: {'imagenetHVZ'})
-        masks {bool} -- whether to load object detection masks (only need for hybrid loss) (default: {False})
+        masks {bool} -- whether to load object detection masks (only needed for hybrid loss) (default: {False})
         class_weights {str} -- whether to use class weights (default: {None})
 
     Returns:
