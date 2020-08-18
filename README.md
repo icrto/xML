@@ -169,16 +169,17 @@ We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area 
 
 ## Implementation
 
-- ConvMod.py
-- Dataset.py
-- Explainer.py
-- ExplainerClassifierCNN.py
-- Losses.py
-- ResNetMod.py
-- test.py
-- train.py
-- utils.py
-- VGG.py
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/ConvMod.py">ConvMod.py</a>
+This file simply contains the ConvMod class (used in both Explainer.py and VGG.py)
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py">Dataset.py</a>
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/Explainer.py">Explainer.py</a>
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/ExplainerClassifierCNN.py">ExplainerClassifierCNN.py</a>
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/Losses.py">Losses.py</a>
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/ResNetMod.py">ResNetMod.py</a>
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py">test.py</a>
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a>
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/utils.py">utils.py</a>
+- <a href="https://github.com/icrto/xML/blob/master/PyTorch/VGG.py">VGG.py</a>
 
 ## Training
 
