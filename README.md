@@ -75,7 +75,9 @@ With the advent of Deep Learning, in particular Convolutional Neural Networks, t
 However, we argue that interpretability should be taken into account from the start, as a design requirement and a desirable property of the system. As such, we propose an <b>in-model approach</b>, i.e. an interpretability method applied during training of the main model. The proposed joint architecture, as can be seen below, is composed by and Explainer and a Classifier.
 </p>
 
-<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/architecture.png">
+<p align="center">
+<img src="https://github.com/icrto/xML/blob/master/example_images/architecture.png">
+</p>
 
 <p align="justify">
   The <b>explainer</b>, as the name implies, is responsible for taking an input image and producing (in an <b>unsupervised manner</b>) the corresponding visual explanation for why the classification module classified that image in a certain way. This visual explanation takes the form of a <b>heatmap</b>, highlighting the most relevant regions that lead to the final decision. This module, an encoder-decoder, is based on the widely known UNET, originally proposed for medical image segmentation.
@@ -138,7 +140,9 @@ However, we argue that interpretability should be taken into account from the st
 Montavon et. al proposed a <b>perturbation process to assess explanation quality</b>. This process is explained in <a href="https://www.sciencedirect.com/science/article/pii/S1051200417302385">Methods for interpreting and understanding deep neural networks</a> and a representative picture taken from that paper is found below.
 <p>
 
-<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/perturbation_process.png">
+<p align="center">
+<img src="https://github.com/icrto/xML/blob/master/example_images/perturbation_process.png" width=600 height=400>
+</p> 
 
 <p align="justify">
 The perturbation process can be described as follows: we start by first dividing the heatmaps (produced by some interpretability method under assessment) into a predifined <b>grid</b>. Afterwards, for each patch/tile of this grid we compute the average pixel values, so that patches with higher relevance (as indicated by the heatmap) give higher values. The next step is <b>sorting</b> these patches in <b>descending order</b> according to these previously computed values. Then, starting from the patch with higher heatmap relevance, we perturb that area in the original image and forward that perturbed image through our classification network, obtaining the output value (f(x) - softmax probability for the positive class, for example). Finally, we repeat this process, but this time adding to the initial perturbation the next most relevant patch, and so on until the whole image is perturbed or a certain number of perturbation steps is reached.
@@ -183,15 +187,23 @@ We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area 
 ## Results
 ### ImagenetHVZ
 
-<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png" width=1420 height=400>
+<p align="center">
+<img src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png" width=1420 height=400>
+</p>
 
-<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_avgfunction.png">
+<p align="center">
+<img src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_avgfunction.png">
+</p>
 
-<img align="center" src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_aopc.png">
+<p align="center">
+<img src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_aopc.png">
+</p>
 
 ### NIH-NCI Cervical Cancer
-<img align="center" width=1420 height=400 src="https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png">
 
+<p align="center">
+<img width=1420 height=400 src="https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png">
+</p>
 ## Requirements
 
 For the PyTorch version please consult [requirements_pytorch.txt](https://github.com/icrto/xML/blob/master/requirements_pytorch.txt). 
