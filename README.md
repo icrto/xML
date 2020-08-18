@@ -94,6 +94,14 @@ Although in the picture we represented a VGG16-based classifier, <b>any classifi
 </p>
 
 ## Loss
+<p align="justify">
+Our main loss function is simply defined as a weighted sum of a classification loss and an explanation loss. Briefly, the hyperparameter α allows the user to control how much importance to give to each of the modules. During training (see section <a href="https://github.com/icrto/xML#Training">training</a>), we use different α values according to the module being trained at each stage.
+</p>
+
+<p align="justify">
+The classification loss we used was categorical cross entropy, similarly to what is done in conventional multiclass classification problems. For the explanation loss we propose two alternatives, an unsupervised approach and a hybrid approach (unsupervised + weakly-supervised terms).
+</p>
+
 ![JointLoss](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D%20%3D%20%5Calpha%20%5Cmathcal%7BL%7D_%7Bclass%7D%20&plus;%20%281%20-%20%5Calpha%29%20%5Cmathcal%7BL%7D_%7Bexpl%7D)
 
 ### Unsupervised Explanation Loss
