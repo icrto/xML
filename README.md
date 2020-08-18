@@ -69,11 +69,29 @@ Some preliminary work was published in:
 ## Architecture
 <p align="justify">
   With the advent of Deep Learning, in particular Convolutional Neural Networks, there is also a growing demand for Interpretability/Explainability of these highly complex and abstract models. Several interpretability methods have already been proposed, and these are for the most part post-model methods, i.e. methods applied after the main (classification) model is trained.
+</p>
 
-However, we argue that interpretability should be taken into account from the start, being a design requirement and a desirable property of the system. As such, we propose an in-model approach, i.e. an interpretability method applied during training of the main model.  
+<p align="justify">
+However, we argue that interpretability should be taken into account from the start, as a design requirement and a desirable property of the system. As such, we propose an <b>in-model approach</b>, i.e. an interpretability method applied during training of the main model. The proposed joint architecture, as can be seen below, is composed by and Explainer and a Classifier.
 </p>
 
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/architecture.png">
+
+<p align="justify">
+  The <b>explainer</b>, as the name implies, is responsible for taking an input image and producing the corresponding visual explanation for why the classification module classified that image in a certain way. This visual explanation takes the form of a <b>heatmap</b>, highlighting the most relevant regions that lead to the final decision. This module, an encoder-decoder, is based on the widely known UNET, originally proposed for medical image segmentation.
+</p>
+
+<p align="justify">
+  The <b>classifier</b> (the "main" module) not only takes as input the same image, but also the output of the explainer, i.e., it is trained using the explanation. The main idea is that the classifier should focus only on the relevant image regions, which is aligned with the intuition that, when explaining a decision (whether or not an image contains a dog) humans tend to first separate what is the object of interest and what is "background", and then proceed to look for patterns in the region where the object is in order to classify it correctly. Conversely, sometimes humans cannot tell if an object belongs to some class, but can tell which regions of the image do not contain said class (when classifying cervical cancer lesions, one is sure that the area outside the cervix is irrelevant for this problem).
+</p>
+
+<p align="justify">
+Both modules are connected by the purple arrows represented in the picture. These arrows represent one of the two inputs to a custom multiplication layer responsible for performing the element-wise multiplication of the classifier layer with the the explainer’s output. In order for this operation to be possible, the explainer's output is downsampled by average pooling (see the paper for further details on why it is essential that this is done by average pooling instead of max pooling). These connections allow the classifier to focus only on the important image regions highlighted by the explainer.
+</p>
+
+<p align="justify">
+Although in the picture we represented a VGG16-based classifier, <b>any classification model can be used</b>, provided that the correct connections are introduced. In fact, the results we show were obtained using a ResNet18-based classifier. Since this joint architecture aims at explaining the classifier’s decisions, the classifier should be chosen first, depending on the classification problem and the available data; <b>the explainer must adapt to the classifier and not the other way around</b>.
+</p>
 
 ## Loss
 ![JointLoss](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D%20%3D%20%5Calpha%20%5Cmathcal%7BL%7D_%7Bclass%7D%20&plus;%20%281%20-%20%5Calpha%29%20%5Cmathcal%7BL%7D_%7Bexpl%7D)
