@@ -68,7 +68,7 @@ Some preliminary work was published in:
 
 ## Architecture
 <p align="justify">
-  With the advent of Deep Learning, in particular Convolutional Neural Networks, there is also a growing demand for Interpretability/Explainability of these highly complex and abstract models. Several interpretability methods have already been proposed, and these are for the most part post-model methods, i.e. methods applied after the main (classification) model is trained.
+With the advent of Deep Learning, in particular Convolutional Neural Networks, there is also a growing demand for Interpretability/Explainability of these highly complex and abstract models, mainly in highly regulated areas such as medicine. Several interpretability methods have already been proposed, and these are for the most part post-model methods, i.e. methods applied after the main (classification) model is trained.
 </p>
 
 <p align="justify">
@@ -78,7 +78,7 @@ However, we argue that interpretability should be taken into account from the st
 <img align="center" src="https://github.com/icrto/xML/blob/master/example_images/architecture.png">
 
 <p align="justify">
-  The <b>explainer</b>, as the name implies, is responsible for taking an input image and producing the corresponding visual explanation for why the classification module classified that image in a certain way. This visual explanation takes the form of a <b>heatmap</b>, highlighting the most relevant regions that lead to the final decision. This module, an encoder-decoder, is based on the widely known UNET, originally proposed for medical image segmentation.
+  The <b>explainer</b>, as the name implies, is responsible for taking an input image and producing (in an <b>unsupervised manner</b>) the corresponding visual explanation for why the classification module classified that image in a certain way. This visual explanation takes the form of a <b>heatmap</b>, highlighting the most relevant regions that lead to the final decision. This module, an encoder-decoder, is based on the widely known UNET, originally proposed for medical image segmentation.
 </p>
 
 <p align="justify">
@@ -98,13 +98,14 @@ Although in the picture we represented a VGG16-based classifier, <b>any classifi
 Our main loss function is simply defined as a weighted sum of a classification loss and an explanation loss. Briefly, the hyperparameter α allows the user to control how much importance to give to each of the modules. During training (see section <a href="https://github.com/icrto/xML#Training">training</a>), we use different α values according to the module being trained at each stage.
 </p>
 
+![JointLoss](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D%20%3D%20%5Calpha%20%5Cmathcal%7BL%7D_%7Bclass%7D%20&plus;%20%281%20-%20%5Calpha%29%20%5Cmathcal%7BL%7D_%7Bexpl%7D)
+
 <p align="justify">
 The classification loss we used was categorical cross entropy, similarly to what is done in conventional multiclass classification problems. For the explanation loss we propose two alternatives, an unsupervised approach and a hybrid approach (unsupervised + weakly-supervised terms).
 </p>
 
-![JointLoss](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D%20%3D%20%5Calpha%20%5Cmathcal%7BL%7D_%7Bclass%7D%20&plus;%20%281%20-%20%5Calpha%29%20%5Cmathcal%7BL%7D_%7Bexpl%7D)
-
 ### Unsupervised Explanation Loss
+
 ![UnsupervisedLoss](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D_%7Bexpl%5C_unsup%7D%20%3D%20%5Cbeta%20%5Csum_%7Bi%20%3D%201%7D%5E%7BN%7D%20%5Cmathcal%7BL%7D_%7Bsparsity%7D%28%5Chat%7Bz%7D_i%29%20&plus;%20%281%20-%20%5Cbeta%29%20%5Csum_%7Bi%20%3D%201%7D%5E%7BN%7D%20%5Cmathcal%7BL%7D_%7Bcontiguity%7D%28%5Chat%7Bz%7D_i%29)
 
 ![Sparsity](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D_%7Bsparsity%7D%28%5Chat%7Bz%7D%29%20%3D%20%5Cfrac%7B1%7D%7Bm%20%5Ctimes%20n%7D%20%5Csum_%7Bi%2Cj%7D%5E%7B%20%7D%20%7C%5Chat%7Bz%7D_%7Bi%2Cj%7D%7C%20%5Clabel%7Beq%3Asparsity%7D)
