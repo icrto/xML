@@ -136,7 +136,9 @@ However, we argue that interpretability should be taken into account from the st
 
 <p align="justify">
   Defining what a "good" explanation is and how to <b>measure</b> and compare <b>explanations</b> is still an <b>open problem</b> in this research field. A valid explanation for a certain person, might not be acceptable or understandable to another person. In fact, explanations are context-, audience/user- and domain-dependent, which makes it harder to define quantitative metrics.
-  
+</p>
+
+<p align="justify">
 Montavon et. al proposed a <b>perturbation process to assess explanation quality</b>. This process is explained in <a href="https://www.sciencedirect.com/science/article/pii/S1051200417302385">Methods for interpreting and understanding deep neural networks</a> and a representative picture taken from that paper is found below.
 <p>
 
@@ -185,6 +187,10 @@ We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area 
 
 
 ## Results
+<p align="justify">
+For results on synthetic data check <a href="https://github.com/icrto/xML/tree/master/Synthetic%20Dataset">this</a>.
+</p>
+
 ### ImagenetHVZ
 
 <p align="center">
