@@ -340,5 +340,5 @@ Other interpretability methods → [innvestigate](https://github.com/albermax/in
 ## Contact Info
 
 <p align="justify">
-If you wish to know more about this project or have any questions/suggestions, do not hesitate to contact me at [icrtto@gmail.com](mailto:icrtto@gmail.com) or to open an issue/pull request in the repo.
+If you wish to know more about this project or have any questions/suggestions, do not hesitate to contact me at <a href="mailto:icrtto@gmail.com">icrtto@gmail.com</a> or to open an issue/pull request in the repo.
 </p>
