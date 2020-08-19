@@ -179,13 +179,48 @@ Some preliminary work was published in:
   <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> - this is where the magic happens. As usual, we start by validating and processing our input arguments, creating our model and loading our data into PyTorch <code>dataloaders</code>. Then, we define a <code>for</code> loop for our 3 training phases. For each phase we define different optimisers and learning rate schedulers, as well as different <code>csv</code> files to save our training history. Each phase has a certain number of epochs, so for each epoch we call our <code>train</code> method to actually train our networks and then we call <code>validation</code> for both training and validation sets. Validation is done for our training set as well, although we could just save the training statistics computed in the <code>train</code> method, because we want to average the loss and metrics over the entire training set having our network stable during the process. If we used the statistics from the training step either we would only record these values for our last training mini-batch (i.e. using the most recent "version" of our network) or we would average the results for all the mini-batches (which is not 100% correct since the first mini-batch results would have been obtained from a less trained network than the last mini-batch results obtained from the most recently updated version of our network). After this validation process, we just checkpoint our model and save the results, while also evaluating if it's time to stop training according to an Early Stopping policy. At the end of each phase we also plot the loss and some metrics obtained during our training epochs, as well as the produced explanations.</p></li>
   <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/utils.py">utils.py</a> - contains auxiliary functions, such as image normalisation, freezing and unfreezing of model layers and plotting functions (for plotting metrics and losses' values during training/validation and roc/precision-recall curves).</p></li>
   <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/VGG.py">VGG.py</a> - defines one alternative for the Classifier architecture as a version of the VGG-16 network (see paper and/or source code for a more detailed description of the module). The original VGG-16 is implemented and modified to include the multiplication layers and connections between explainer and classifier. These layers are introduced after each <code>conv-relu-conv-relu</code> stage and before <code>pooling</code>, as shown in the <a href="https://github.com/icrto/xML#Architecture">Architecture</a> section.</p></li>
- </ul>
+</ul>
 
 ## Training
 
-### 3 Phase Process
-### Hyperparameters
+<p align="justify">
+  Training this architecture involves 3 phases:
+</p>
+<ol>
+  <li><p align="justify">Only the <b>Classifier is trained</b>, while the <b>Explainer remains frozen</b>. Note that the Explainer is initialised so that the <b>initial explanations consist of white images</b> (matrices filled with 1s). We achieve this by imposing a large bias ( > 1) in the Explainer’s batch normalisation layer. This bias is controlled by the hyperparameter <code>init_bias</code>. Doing this ensures that the connections between Classifier and Explainer are bypassed. So, the Classifier is not taking the Explainer’s output into account yet, because the Explainer has not been trained at this point. The intuition is that we start by considering the whole image as an explanation (at the beginning every pixel/region is considered as relevant for the decision) and gradually eliminate irrelevant regions as redundancy is eliminated (see the GIF below).</p></li>
+  <li><p align="justify">The process is reversed: the <b>Classifier remains frozen</b>, but the <b>Explainer learns</b> by altering its explanations and assessing the corresponding impact on the classification. This happens because the joint classification and explanation loss affects both modules (but only the Explainer is updated accordingly in this phase). In practice, the <b>Explainer is indirectly trained with the supervision of the classification component</b>.</p></li>
+  <li><p align="justify">Finally the <b>whole architecture is fine-tuned end-to-end</b>. The Classifier learns with the new information provided by the Explainer, refining its classification outputs. At the same time, the Explainer continues adapting its explanations to the concepts the Classifier is learning and considers important for classifying the images.</p></li>
+</ol>
 
+<b>IMPORTANT REMARKS</b>
+<p align="justify">
+  It is imperative that <b>at the end of phase 1 the Classifier remains somewhat unstable</b>, i.e., that its loss does not plateau, so that in phase 3 both modules can learn from each other. Otherwise, in phase 3 the Classifier would not update its parameters with the new information provided by the now trained Explainer and vice-versa. Therefore, in the end, both Explainer and Classifier improve, fruit of this dynamic interaction between the two and their respective loss functions.
+</p>
+
+<b>USEFUL TIPS & TRICKS</b>
+<p align="justify">
+  As previously mentioned, we use different values for the <b>α hyperparameter</b> during each of the training phases: during <b>phases 1 and 3, α > 0.5</b>, because the correct classification is an indispensable part of the system; it directly affects the Classifier and indirectly affects the Explainer. Conversely, during <b>phase 2, α < 0.5</b>, so as to give more strength to the Explainer, since it is the only module being trained.
+</p>
+  
+<p align="justify">
+  The <b>β</b> and <b>γ hyperparameters</b> are <b>kept constant</b> during all training phases.
+</p>
+
+<p align="justify">
+  Fine-tuning the number of epochs for each phase can be a tricky process, involving several experiments until one gains the necessary intuition for the specific data one is working with. To aliviate this problem, we present here the intuition we gained during the development of this work (however, this applied to the datasets we used, but <b>might not hold true for every dataset out there</b>). When starting exploring a new dataset, the <b>first thing</b> we did was <b>train only the classifier</b> to see which performance it could reach and if the classification network was adequate to our problem. We usually did this for many epochs (let's say around 100) and tried out different batch sizes, learning rates, optimisers and schedulers. After finding the best configuration that's usually the one we sticked with for every training phase.
+</p>
+
+<p align="justify">
+  Afterwards, and following the important aforementioned remark, as a rule of thumb, we would obtain the number of epochs for our first training phase by "cutting in half" the number of epochs needed to converge our classifier. For example, if it took us 80 epochs to reach a good classification performance, we would define 20 as the number of epochs for our first training phase. This can be a first estimate, but we can actually exaggerate a bit further and cut this number even more (in the paper we used 10 epochs). As another rule of thumb, what we did was look at our <b>classification loss</b> and see where its value had <b>decreased to around 25% of its initial value</b>. So, imagine the loss started at 0.9, and at epoch 12 it reached 0.2, then we would define 10 as the number of epochs for our first training phase.
+</p>
+
+<p align="justify">
+  Having chosen the number of epochs for our first training phase, we can move on to the second. Here we did something similar, and trained our network in this phase (always after training phase 1 as described before) for a great number of epochs to ensure that the <b>Explainer</b> was able to <b>reach a loss of 0</b>. After achieving this, we would choose the number of epochs as the one where the <b>loss had decreased considerably</b> (less than 20% of the initial value), <b>but was not 0</b> (we found out that letting the Explainer reach a loss of 0 would usually render it incapable of leaving this local minima and learning anything in the last training phase).
+</p>
+
+<p align="justify">
+  Finally, we would train the last phase for a considerable number of epochs (usually 100) and let <b>Early Stopping</b> tell us where to stop training. Here we found a bit of a <b>trade-off between accuracy and explanation quality</b>; lowering the classification loss usually meant increasing the explanation loss a bit. However, since our main focus is still the classification component (remember we use α > 0.5 in this phase, usually closer to 1.0) we found this aspect to be negligible, especially considering that in the second training phase the explanation loss was close to 0, so it naturally needs to increase a bit to ensure proper classification of the images (we don't want every feature map to be multiplied by zeros).
+</p>
 
 ## Results
 <p align="justify">
