@@ -198,6 +198,7 @@ Some preliminary work was published in:
 </p>
 
 <b>USEFUL TIPS & TRICKS</b>
+
 <p align="justify">
   As previously mentioned, we use different values for the <b>α hyperparameter</b> during each of the training phases: during <b>phases 1 and 3, α > 0.5</b> (closer to 1.0), because the correct classification is an indispensable part of the system; it directly affects the Classifier and indirectly affects the Explainer. Conversely, during <b>phase 2, α < 0.5</b> (closer to 0), so as to give more strength to the Explainer, since it is the only module being trained.
 </p>
@@ -205,6 +206,10 @@ Some preliminary work was published in:
 <p align="justify">
   The <b>β</b> and <b>γ hyperparameters</b> are <b>kept constant</b> during all training phases.
 </p>
+
+<p align="justify">
+  For the last training phase, we started by tuning α, keeping β constant at 1. We first performed a coarse grained search in the range {0.5, 0.75, 0.9} and found out that a value around 0.9 produced the most reasonable explanations, while maintaining the predictive performance. The β hyperparameter was tuned by searching within a broader range, [0.0, 1.0], and afterwards within a smaller set, {0.75, 0.8, 0.9, 0.99}. Finally, in the hybrid scenario, γ was tuned by searching in {10.0, 1.0, 1e − 2, 1e − 4} while keeping the best β value.
+ </p>
 
 <p align="justify">
   Fine-tuning the number of epochs for each phase can be a tricky process, involving several experiments until one gains the necessary intuition for the specific data one is working with. To aliviate this problem, we present here the intuition we gained during the development of this work (however, this applied to the datasets we used, but <b>might not hold true for every dataset out there</b>). When starting exploring a new dataset, the <b>first thing</b> we did was <b>train only the classifier</b> to see which performance it could reach and if the classification network was adequate to our problem. We usually did this for many epochs (let's say around 100) and tried out different batch sizes, learning rates, optimisers and schedulers. After finding the best configuration that's usually the one we sticked with for every training phase.
@@ -228,6 +233,15 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 </p>
 
 ### ImagenetHVZ
+
+<p align="justify">
+  As the name implies, this dataset is a sub-set of ImageNet, composed only by horses and zebras (synsets n02389026 and n02391049, respectively). Of the 2600 images, we kept only the ones for which bounding boxes were available, totalling 324 images of horses and 345 images of zebras. Data was split into 85%-15% for training and testing, giving a total of 100 images for the latter. The training set was further split into 80%-20% for training and validation.
+ </p>
+
+<p align="justify">
+  Taking into account the tips & tricks previously mentioned, here is the summary of the hyperparameter values used when conducting experiments on the imagenetHVZ dataset.
+ </p>
+
 <p align="center">
 <img src="https://github.com/icrto/xML/blob/master/example_images/tableimagenetHVZ.png" width=500>
 </p>
@@ -245,6 +259,14 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 </p>
 
 ### NIH-NCI Cervical Cancer
+
+<p align="justify">
+  We also used a medical dataset, the NIH-NCI Cervical Cancer Dataset. We used 2120 images (all with bounding boxes of the cervix region available). We divided the data as follows: instances with no histology done, normal or less than CIN2 are considered as not cancerous; the rest are considered cancerous. This dataset was split into 95%-5% for training and testing (106 images for testing), and the training set was further divided into 80%-20% for training and validation.
+</p>
+
+<p align="justify">
+  The following table presents the hyperparameters used in the experiments done with this dataset.
+</p>
 
 <p align="center">
 <img src="https://github.com/icrto/xML/blob/master/example_images/tableNIH.png" width=500>
