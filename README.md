@@ -240,14 +240,27 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 
 <p align="justify">
   Taking into account the tips & tricks previously mentioned, here is the summary of the hyperparameter values used when conducting experiments on the imagenetHVZ dataset.
- </p>
+</p>
 
 <p align="center">
 <img src="https://github.com/icrto/xML/blob/master/example_images/tableimagenetHVZ.png" width=500>
 </p>
 
+<p align="justify">
+  Below is shown a comparison between the proposed approaches and some state-of-the-art post-model interpretability methods, as well as a Canny edge detector and an Otsu segmentation. Each explainability method (column) is accompanied by the respective POMPOM value for entire the test set, and, for each image (row), we also compute the class confidence score (we show two images of zebras and two images of horses, respectively). The colourmap ranges from purple to yellow (between [0, 1]) and absolute pixel values were considered for all methods for a fair comparison.
+</p>
+
+<p align="justify">
+ It can be seen that the explanations produced by our network are image- and class-dependent, and highlight in a clearer way the relevant image regions. Keeping in mind that the dataset is only composed by images of zebras and horses, one of the main properties that distinguishes both animals is the texture of their fur, which is clearly highlighted by the proposed approaches. It is also worth noting that horses are identifiable via their riding equipment (5th row), and their legs and hooves (6th row). As expected, explanations produced by the hybrid approach present less active pixels outside the region of interest when compared to the ones produced by the unsupervised approach.
+</p>
+
 <p align="center">
 <img src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png" width=1420 height=400>
+</p>
+
+<p align="justify">
+  We tested several patch sizes to assess the impact of the perturbation in relation to kernel size, and other perturbation strategies (gray, white, black and random uniform) to guarantee independence from the model.
+  As expected, the average function value decreases and AOPC in- creases with the number of patches removed (by most to least relevant). Furthermore, the hybrid approach slightly outperforms the unsupervised approach, and both outperform state-of-the-art methods. We also verified that, similarly to what was described by Samek et al. [18], with a patch size much larger than the kernel size (16 × 16 and 32 × 32), AOPC scores are higher, as we are ob- taining a region score closer to the filter score, which means that perturbing that region largely impacts the filter response and, con- sequently, lowers the classification performance. Conversely, per- turbing smaller regions (4 × 4 and 8 × 8) has less impact on the filter response, leading to smaller AOPC values.
 </p>
 
 <p align="center">
@@ -261,7 +274,7 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 ### NIH-NCI Cervical Cancer
 
 <p align="justify">
-  We also used a medical dataset, the NIH-NCI Cervical Cancer Dataset. We used 2120 images (all with bounding boxes of the cervix region available). We divided the data as follows: instances with no histology done, normal or less than CIN2 are considered as not cancerous; the rest are considered cancerous. This dataset was split into 95%-5% for training and testing (106 images for testing), and the training set was further divided into 80%-20% for training and validation.
+  We also used a medical dataset, the NIH-NCI Cervical Cancer Dataset. We used 2120 images (all with bounding boxes of the cervix region available). We divided the data as follows: instances with no histology done, normal or less than CIN2 (Cervical Intraepithelial Neoplasia) are considered as not cancerous; the rest are considered cancerous. This dataset was split into 95%-5% for training and testing (106 images for testing), and the training set was further divided into 80%-20% for training and validation.
 </p>
 
 <p align="justify">
@@ -327,5 +340,5 @@ Other interpretability methods → [innvestigate](https://github.com/albermax/in
 ## Contact Info
 
 <p align="justify">
-If you wish to know more about this project, do not hesitate to contact me at icrtto@gmail.com or to open an issue in the repo.
+If you wish to know more about this project or have any questions/suggestions, do not hesitate to contact me at [icrtto@gmail.com](mailto:icrtto@gmail.com) or to open an issue/pull request in the repo.
 </p>
