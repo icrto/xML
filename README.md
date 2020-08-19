@@ -2,7 +2,7 @@
 This is the official implementation of the paper [Understanding the decisions of CNNs: an in-model approach](https://doi.org/10.1016/j.patrec.2020.04.004). 
 
 <p align="justify">
-It also includes my master thesis "Producing Decisions and Explanations: A Joint Approach Towards Explainable CNNs" (full document and final presentation), in which the paper was based and further extended.
+  It also includes my master thesis "Producing Decisions and Explanations: A Joint Approach Towards Explainable CNNs" (full document and final presentation), in which the paper was based on and further extended.
 
 If you use this repository, please cite:
 </p>
@@ -68,11 +68,11 @@ Some preliminary work was published in:
 
 ## Architecture
 <p align="justify">
-With the advent of Deep Learning, in particular Convolutional Neural Networks, there is also a growing demand for Interpretability/Explainability of these highly complex and abstract models, mainly in highly regulated areas such as medicine. Several interpretability methods have already been proposed, and these are for the most part post-model methods, i.e. methods applied after the main (classification) model is trained.
+  With the advent of Deep Learning, in particular Convolutional Neural Networks, there is also a growing demand for Interpretability/Explainability of these highly complex and abstract models, mainly in highly regulated areas such as medicine. Several interpretability methods have already been proposed, and these are for the most part post-model methods, i.e. methods applied after the main (classification) model is trained.
 </p>
 
 <p align="justify">
-However, we argue that interpretability should be taken into account from the start, as a design requirement and a desirable property of the system. As such, we propose an <b>in-model approach</b>, i.e. an interpretability method applied during training of the main model. The proposed joint architecture, as can be seen below, is composed by an Explainer and a Classifier, and is capable of producing visual explanations for classification decisions in an unsupervised way.
+  However, we argue that interpretability should be taken into account from the start, as a design requirement and a desirable property of the system. As such, we propose an <b>in-model approach</b>, i.e. an interpretability method applied during training of the main model. The proposed joint architecture, as can be seen below, is composed by an Explainer and a Classifier, and is capable of producing visual explanations for classification decisions in an unsupervised way.
 </p>
 
 <p align="center">
@@ -80,15 +80,15 @@ However, we argue that interpretability should be taken into account from the st
 </p>
 
 <p align="justify">
-  The <b>Explainer</b>, as the name implies, is responsible for taking an input image and producing (in an <b>unsupervised manner</b>) the corresponding visual explanation for why the classification module classified that image in a certain way. This visual explanation takes the form of a <b>heatmap</b>, highlighting the most relevant regions that lead to the final decision. This module, an encoder-decoder, is based on the widely known UNET, originally proposed for medical image segmentation.
+  The <b>Explainer</b>, as the name implies, is responsible for taking an input image and producing (in an <b>unsupervised manner</b>) the corresponding visual explanation for why the classification module classified that image in a certain way. This visual explanation takes the form of a <b>heatmap</b>, highlighting the most relevant regions that lead to the final decision. This module, an encoder-decoder network, is based on the widely known UNET, originally proposed for medical image segmentation.
 </p>
 
 <p align="justify">
-  The <b>Classifier</b> (the "main" module) not only takes as input the same image, but also the output of the explainer, i.e., it is trained using the explanation. The main idea is that the classifier should focus only on the relevant image regions, which is aligned with the intuition that, when explaining a decision (whether or not an image contains a dog) humans tend to first separate what is the object of interest and what is "background", and then proceed to look for patterns in the region where the object is in order to classify it correctly. Conversely, sometimes humans cannot tell if an object belongs to some class, but can tell which regions of the image do not contain said class (when classifying cervical cancer lesions, one is sure that the area outside the cervix is irrelevant for this problem).
+  The <b>Classifier</b> (the "main" module) not only takes as input the same image, but also the output of the Explainer, i.e., it is trained using the explanation. The main idea is that the classifier should focus only on the relevant image regions, aligned with the intuition that, when explaining a decision (whether or not an image contains a dog) humans tend to first separate what is the object of interest and what is "background", and then proceed to look for patterns in the region where the object is in order to classify it correctly. Conversely, sometimes humans cannot tell if an object belongs to some class, but can tell which regions of the image do not contain that class (when classifying cervical cancer lesions, one is sure that the area outside the cervix is irrelevant for the problem at hand).
 </p>
 
 <p align="justify">
-  Both modules are connected by the purple arrows represented in the picture. These arrows represent one of the two inputs to a custom multiplication layer responsible for performing the element-wise multiplication of the classifier layer with the the explainer’s output. In order for this operation to be possible, the explainer's output is downsampled by average pooling (see the paper for further details on why it is essential that this is done by average pooling instead of max pooling). These connections allow the classifier to focus only on the important image regions highlighted by the explainer.
+  Both modules are connected by the purple arrows represented in the picture. These arrows represent one of the two inputs to a custom multiplication layer responsible for performing the element-wise multiplication of the Classifier layer with the the Explainer’s output. In order for this operation to be possible, the Explainer's output is downsampled by average pooling (see the paper for further details on why it is essential that this is done by average pooling instead of max pooling). These connections allow the Classifier to focus only on the important image regions highlighted by the Explainer.
 </p>
 
 <p align="justify">
@@ -97,7 +97,7 @@ However, we argue that interpretability should be taken into account from the st
 
 ## Loss
 <p align="justify">
-  Our main loss function is simply defined as a <b>weighted sum of a classification loss and an explanation loss</b>. Briefly, the hyperparameter α allows the user to control how much importance to give to each of the modules. During training (see section <a href="https://github.com/icrto/xML#Training">training</a>), we use different α values according to the module being trained at each stage.
+  Our main loss function is simply defined as a <b>weighted sum of a classification loss and an explanation loss</b>. Briefly, the hyperparameter α allows the user to control how much importance to give to each of the modules. During training (see section <a href="https://github.com/icrto/xML#Training">Training</a>), we use different α values according to the module being trained at each stage.
 </p>
 
 ![JointLoss](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D%20%3D%20%5Calpha%20%5Cmathcal%7BL%7D_%7Bclass%7D%20&plus;%20%281%20-%20%5Calpha%29%20%5Cmathcal%7BL%7D_%7Bexpl%7D)
@@ -114,13 +114,13 @@ However, we argue that interpretability should be taken into account from the st
 ![UnsupervisedLoss](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D_%7Bexpl%5C_unsup%7D%20%3D%20%5Cbeta%20%5Csum_%7Bi%20%3D%201%7D%5E%7BN%7D%20%5Cmathcal%7BL%7D_%7Bsparsity%7D%28%5Chat%7Bz%7D_i%29%20&plus;%20%281%20-%20%5Cbeta%29%20%5Csum_%7Bi%20%3D%201%7D%5E%7BN%7D%20%5Cmathcal%7BL%7D_%7Bcontiguity%7D%28%5Chat%7Bz%7D_i%29)
 
 <p align="justify">
-  Through the <b>penalised l1 norm</b> we ensure sparsity, by minimising the pixel-wise content of the produced heatmaps, performing feature selection. As is further detailed in the paper, this penalty works as an explanation budget, limiting the percentage of the input image that can be considered an explanation.
+  Through the <b>penalised l1 norm</b> we ensure sparsity, by minimising the pixel-wise content of the produced heatmaps, performing feature selection. As is further detailed in the paper, this penalty works as an explanation budget, limiting the percentage of the input image pixels that can be considered as part of the explanation. The greater the penalty, the smaller the available budget and less pixels are highlighted.
 </p>
 
 ![Sparsity](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D_%7Bsparsity%7D%28%5Chat%7Bz%7D%29%20%3D%20%5Cfrac%7B1%7D%7Bm%20%5Ctimes%20n%7D%20%5Csum_%7Bi%2Cj%7D%5E%7B%20%7D%20%7C%5Chat%7Bz%7D_%7Bi%2Cj%7D%7C%20%5Clabel%7Beq%3Asparsity%7D)
 
 <p align="justify">
-  Spatial contiguity is promoted through the <b>total variation</b> loss term, which encourages minimised local spatial transitions, both horizontally and vertically (we want the absolute differences between each row/column and the next to be small). 
+  Spatial contiguity is promoted through the <b>total variation</b> loss term, which encourages minimised local spatial transitions, both horizontally and vertically (we want the absolute differences between each row/column and the next to be as small as possible). 
 </p>
 
 ![Contiguity](https://latex.codecogs.com/gif.latex?%5Cmathcal%7BL%7D_%7Bcontiguity%7D%28%5Chat%7Bz%7D%29%20%3D%20%5Cfrac%7B1%7D%7Bm%20%5Ctimes%20n%7D%20%5Csum_%7Bi%2Cj%7D%5E%7B%20%7D%7C%5Chat%7Bz%7D_%7Bi&plus;1%2Cj%7D%20-%20%5Chat%7Bz%7D_%7Bi%2Cj%7D%7C%20&plus;%20%7C%5Chat%7Bz%7D_%7Bi%2Cj&plus;1%7D%20-%20%5Chat%7Bz%7D_%7Bi%2Cj%7D%7C)
@@ -135,11 +135,11 @@ However, we argue that interpretability should be taken into account from the st
 ## Metrics
 
 <p align="justify">
-  Defining what a "good" explanation is and how to <b>measure</b> and compare <b>explanations</b> is still an <b>open problem</b> in this research field. A valid explanation for a certain person, might not be acceptable or understandable to another person. In fact, explanations are context-, audience/user- and domain-dependent, which makes it harder to define quantitative metrics.
+  Defining what a "good" explanation is and how to <b>measure</b> and compare <b>explanations</b> is still an <b>open problem</b> in this research field. A valid explanation for a certain person, might not be acceptable or understandable to another individual. In fact, explanations are context-, audience/user- and domain-dependent, making it difficult to define quantitative metrics.
 </p>
 
 <p align="justify">
-Montavon et. al proposed a <b>perturbation process to assess explanation quality</b>. This process is explained in <a href="https://www.sciencedirect.com/science/article/pii/S1051200417302385">Methods for interpreting and understanding deep neural networks</a> and a representative picture taken from that paper is found below.
+  Montavon et. al proposed a <b>perturbation process to assess explanation quality</b>. This process is explained in <a href="https://www.sciencedirect.com/science/article/pii/S1051200417302385">Methods for interpreting and understanding deep neural networks</a> and a representative picture taken from that paper is found below.
 <p>
 
 <p align="center">
@@ -147,15 +147,15 @@ Montavon et. al proposed a <b>perturbation process to assess explanation quality
 </p> 
 
 <p align="justify">
-The perturbation process can be described as follows: we start by first dividing the heatmaps (produced by some interpretability method under assessment) into a predifined <b>grid</b>. Afterwards, for each patch/tile of this grid we compute the average pixel values, so that patches with higher relevance (as indicated by the heatmap) give higher values. The next step is <b>sorting</b> these patches in <b>descending order</b> according to these previously computed values. Then, starting from the patch with higher heatmap relevance, we perturb that area in the original image and forward that perturbed image through our classification network, obtaining the output value (f(x) - softmax probability for the positive class, for example). Finally, we repeat this process, but this time adding to the initial perturbation the next most relevant patch, and so on until the whole image is perturbed or a certain number of perturbation steps is reached.
+  The perturbation process can be described as follows: we start by first dividing the heatmaps (produced by some interpretability method under assessment) into a predefined <b>grid</b>. Afterwards, for each patch/tile of this grid we compute the average of its pixel values, so that patches with higher relevance (as indicated by the heatmap) give higher values. The next step is <b>sorting</b> these patches in <b>descending order</b> according to these previously computed values. Then, starting from the patch with higher relevance, we perturb that area in the original image and forward the now perturbed image through our classification network, obtaining the output value f(x) (softmax probability for the positive class, for example). Finally, we repeat this process, but this time adding to the initial perturbation the next most relevant patch, and so on until the whole image is perturbed or a certain number of perturbation steps is reached.
 </p>
 
 <p align="justify">
-The intuition is that, <b>the more relevant the patch, the more it will affect (decrease) the classification output</b>, so we expect a steeper decrease in f(x) in the initial stages of the perturbation process and a lower slope of the curve from there onwards. This curve is called the <b>MoRF (Most Relevant First) curve</b>. 
+  The intuition is that, <b>the more relevant the patch, the more it will affect (decrease) the classification output</b>, so we expect a steeper decrease in f(x) in the initial stages of the perturbation process and a lower slope of the curve from there onwards. This curve is called the <b>MoRF (Most Relevant First) curve</b>. 
 </p>
 
 <p align="justify">
-We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area Over the MoRF Curve</b>, averaged over the entire test set. Conversely to what is expected with the MoRF curve, the AOPC curve should have a somewhat logarithmic behaviour, since as we add less relevant patches, they will have a small influence in f(x) (that is ideally already presenting small values). This leads to the addition of a small area to the cumulative area given by AOPC.
+  We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area Over the MoRF Curve</b>, averaged over the entire test set. Conversely to what is expected with the MoRF curve, the AOPC curve should increase, since we are accumulating bigger and bigger areas (the steepest the decrease in the MoRF curve, the greater the area over it).
 </p>
 
 ![AOPC](https://latex.codecogs.com/gif.latex?AOPC%20%3D%20%5Cfrac%7B1%7D%7BL%20&plus;%201%7D%5Cbigg%5Clangle%5Csum%5Climits_%7Bk%3D0%7D%5E%7BL%7D%20f%28x_%7BMoRF%7D%5E%7B%280%29%7D%29%20-%20f%28x_%7BMoRF%7D%5E%7B%28k%29%7D%29%5Cbigg%5Crangle_%7Bp%28x%29%7D)
@@ -170,15 +170,15 @@ We then measure explanation quality, by computing <b>AOPC</b>, i.e. the <b>Area 
 ## Implementation
 <ul>
   <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/ConvMod.py">ConvMod.py</a> - contains the ConvMod class (used in both <a href="https://github.com/icrto/xML/blob/master/PyTorch/Explainer.py">Explainer.py</a> and <a href="https://github.com/icrto/xML/blob/master/PyTorch/VGG.py">VGG.py</a>), that implements a conv-relu-conv-relu module.</p></li>
-  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py">Dataset.py</a> - provides the Dataset class, necessary to create a PyTorch <code>dataloader</code>. The <code>__getitem__</code> function is responsible for randomly sampling an image from the corresponding pandas dataframe (previously obtained with the <code>load_data</code> function), with its respective label and mask. The mask is only provided if the variable <code>masks</code> is set to <code>True</code>, which might only be needed in case one wants to apply the hybrid loss.</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py">Dataset.py</a> - provides the Dataset class, necessary to create a PyTorch <code>dataloader</code>. The <code>__getitem__</code> function is responsible for randomly sampling an image from the corresponding pandas dataframe (previously obtained with the <code>load_data</code> function), with its respective label and mask. The mask is only provided if the variable <code>masks</code> is set to <code>True</code>, which might only be needed in case one wants to apply the hybrid explanation loss.</p></li>
   <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/Explainer.py">Explainer.py</a> - defines the Explainer's layers (see paper and/or source code for a more detailed description of the module).</p></li>
-  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/ExplainerClassifierCNN.py">ExplainerClassifierCNN.py</a> - contains the implementation of the joint architecture. It instantiates the explainer and a classifier (chosen from a list of modified resnet models or our VGG-based implementation). In this file the methods <code>train</code>, <code>validation</code>, <code>test</code> and <code>save_explanations</code> are implemented. The <code>train</code> method is responsible for one epoch of training: it starts by freezing/unfreezing each module according to the current training phase (as described in the <a href="https://github.com/icrto/xML#Training">training</a> section), then performs the forward and backward passes, computing the loss and updating the network's parameters accordingly. The <code>validation</code> and <code>test</code> methods are similar, performing a forward pass in eval mode and computing several evaluation metrics for both classification and explanation parts. Finally, the <code>save_explanations</code> method plots and saves the produced explanations.</p></li>
-  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/Losses.py">Losses.py</a> - contains the implementations for the unsupervised and hybrid explanation losses, both for a single instance and for a mini-batch.</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/ExplainerClassifierCNN.py">ExplainerClassifierCNN.py</a> - contains the implementation of the joint architecture. It instantiates the explainer and a classifier (chosen from a list of modified resnet models or our VGG-based implementation). In this file the methods <code>train</code>, <code>validation</code>, <code>test</code> and <code>save_explanations</code> are implemented. The <code>train</code> method is responsible for one epoch of training: it starts by freezing/unfreezing each module according to the current training phase (as described in the <a href="https://github.com/icrto/xML#Training">Training</a> section), then performs the forward and backward passes, computing the loss and updating the network's parameters accordingly. The <code>validation</code> and <code>test</code> methods are similar, performing a forward pass in eval mode and computing several evaluation metrics for both classification and explanation parts. Finally, the <code>save_explanations</code> method plots and saves the produced explanations alongside their respective original input images.</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/Losses.py">Losses.py</a> - contains the implementations for the unsupervised and hybrid explanation losses, both for a single instance and for a mini-batch with different <code>reduction</code> modes.</p></li>
   <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/ResNetMod.py">ResNetMod.py</a> - defines one alternative for the Classifier architecture as a modified version of the ResNet network (see paper and/or source code for a more detailed description of the module). The original ResNet source code (from <code>torchvision</code>) is modified to include the multiplication layers and connections between explainer and classifier. These layers are introduced after the first layers and after each super-block.</p></li>
   <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py">test.py</a></p></li>
   <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a></p></li>
   <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/utils.py">utils.py</a> - contains auxiliary functions, such as image normalisation, freezing and unfreezing of model layers and plotting functions (for plotting metrics and losses' values during training/validation and roc/precision-recall curves).</p></li>
-  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/VGG.py">VGG.py</a> - defines one alternative for the Classifier architecture as a version of the VGG-16 network (see paper and/or source code for a more detailed description of the module). The original VGG-16 is modified to include the multiplication layers and connections between explainer and classifier. These layers are introduced after each <code>conv-relu-conv-relu</code> stage and before <code>pooling</code>, as shown in the <a href="https://github.com/icrto/xML#Architecture">Architecture</a> section.</p></li>
+  <li><p align="justify"><a href="https://github.com/icrto/xML/blob/master/PyTorch/VGG.py">VGG.py</a> - defines one alternative for the Classifier architecture as a version of the VGG-16 network (see paper and/or source code for a more detailed description of the module). The original VGG-16 is implemented and modified to include the multiplication layers and connections between explainer and classifier. These layers are introduced after each <code>conv-relu-conv-relu</code> stage and before <code>pooling</code>, as shown in the <a href="https://github.com/icrto/xML#Architecture">Architecture</a> section.</p></li>
  </ul>
 
 ## Training
