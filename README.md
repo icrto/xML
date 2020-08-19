@@ -228,16 +228,9 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 </p>
 
 ### ImagenetHVZ
-
-|     Hyperparameter/Phase     |   1  |   2  |   3  |
-|:----------------------------:|:----:|:----:|:----:|
-|               α              |  1.0 | 0.25 |  0.9 |
-|               β              |         0.9        |
-| γ (for hybrid scenario only) |         1.0        |
-|       number of epochs       |  10  |  10  |  100 |
-|           init_bias          |  3.0 |   -  |   -  |
-|      learning rate (clf)     | 0.01 |   0  | 0.01 |
-|     learning rate (expl)     |   0  | 0.01 | 0.01 |
+<p align="center">
+<img src="https://github.com/icrto/xML/blob/master/example_images/tableimagenetHVZ.png" width=500>
+</p>
 
 <p align="center">
 <img src="https://github.com/icrto/xML/blob/master/example_images/imagenetHVZ_grid_explanations.png" width=1420 height=400>
@@ -253,15 +246,9 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 
 ### NIH-NCI Cervical Cancer
 
-|     Hyperparameter/Phase     |   1  |   2  |   3  |
-|:----------------------------:|:----:|:----:|:----:|
-|               α              |  1.0 | 0.25 | 0.99 |
-|               β              |         0.9        |
-| γ (for hybrid scenario only) |         1.0        |
-|       number of epochs       |  30  |  10  |  50  |
-|           init_bias          |  3.0 |   -  |   -  |
-|      learning rate (clf)     | 0.01 |   0  | 0.01 |
-|     learning rate (expl)     |   0  | 0.01 | 0.01 |
+<p align="center">
+<img src="https://github.com/icrto/xML/blob/master/example_images/tableNIH.png" width=500>
+</p>
 
 <p align="center">
 <img width=1420 height=400 src="https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png">
