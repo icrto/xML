@@ -199,7 +199,7 @@ Some preliminary work was published in:
 
 <b>USEFUL TIPS & TRICKS</b>
 <p align="justify">
-  As previously mentioned, we use different values for the <b>α hyperparameter</b> during each of the training phases: during <b>phases 1 and 3, α > 0.5</b>, because the correct classification is an indispensable part of the system; it directly affects the Classifier and indirectly affects the Explainer. Conversely, during <b>phase 2, α < 0.5</b>, so as to give more strength to the Explainer, since it is the only module being trained.
+  As previously mentioned, we use different values for the <b>α hyperparameter</b> during each of the training phases: during <b>phases 1 and 3, α > 0.5</b> (closer to 1.0), because the correct classification is an indispensable part of the system; it directly affects the Classifier and indirectly affects the Explainer. Conversely, during <b>phase 2, α < 0.5</b> (closer to 0), so as to give more strength to the Explainer, since it is the only module being trained.
 </p>
   
 <p align="justify">
