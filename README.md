@@ -232,8 +232,8 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 |     Hyperparameter/Phase     |   1  |   2  |   3  |
 |:----------------------------:|:----:|:----:|:----:|
 |               α              |  1.0 | 0.25 |  0.9 |
-|               β              |  0.9 |      |      |
-| γ (for hybrid scenario only) |  1.0 |      |      |
+|               β              |         0.9        |
+| γ (for hybrid scenario only) |         1.0        |
 |       number of epochs       |  10  |  10  |  100 |
 |           init_bias          |  3.0 |   -  |   -  |
 |      learning rate (clf)     | 0.01 |   0  | 0.01 |
@@ -256,8 +256,8 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 |     Hyperparameter/Phase     |   1  |   2  |   3  |
 |:----------------------------:|:----:|:----:|:----:|
 |               α              |  1.0 | 0.25 | 0.99 |
-|               β              |  0.9 |      |      |
-| γ (for hybrid scenario only) |  1.0 |      |      |
+|               β              |         0.9        |
+| γ (for hybrid scenario only) |         1.0        |
 |       number of epochs       |  30  |  10  |  50  |
 |           init_bias          |  3.0 |   -  |   -  |
 |      learning rate (clf)     | 0.01 |   0  | 0.01 |
