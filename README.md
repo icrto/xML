@@ -72,7 +72,7 @@ With the advent of Deep Learning, in particular Convolutional Neural Networks, t
 </p>
 
 <p align="justify">
-However, we argue that interpretability should be taken into account from the start, as a design requirement and a desirable property of the system. As such, we propose an <b>in-model approach</b>, i.e. an interpretability method applied during training of the main model. The proposed joint architecture, as can be seen below, is composed by and Explainer and a Classifier.
+However, we argue that interpretability should be taken into account from the start, as a design requirement and a desirable property of the system. As such, we propose an <b>in-model approach</b>, i.e. an interpretability method applied during training of the main model. The proposed joint architecture, as can be seen below, is composed by an Explainer and a Classifier, and is capable of producing visual explanations for classification decisions in an unsupervised way.
 </p>
 
 <p align="center">
