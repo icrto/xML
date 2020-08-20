@@ -139,7 +139,7 @@ Some preliminary work was published in:
 </p>
 
 <p align="justify">
-  Montavon et. al proposed a <b>perturbation process to assess explanation quality</b>. This process is explained in <a href="https://www.sciencedirect.com/science/article/pii/S1051200417302385">Methods for interpreting and understanding deep neural networks</a> and a representative picture taken from that paper is found below.
+  Montavon et. al proposed a <b>perturbation/occlusion/feature removal process to assess explanation quality</b>. This process is explained in <a href="https://www.sciencedirect.com/science/article/pii/S1051200417302385">Methods for interpreting and understanding deep neural networks</a> and a representative picture taken from that paper is found below.
 <p>
 
 <p align="center">
@@ -147,7 +147,7 @@ Some preliminary work was published in:
 </p> 
 
 <p align="justify">
-  The perturbation process can be described as follows: we start by first dividing the heatmaps (produced by some interpretability method under assessment) into a predefined <b>grid</b>. Afterwards, for each patch/tile of this grid we compute the average of its pixel values, so that patches with higher relevance (as indicated by the heatmap) give higher values. The next step is <b>sorting</b> these patches in <b>descending order</b> according to these previously computed values. Then, starting from the patch with higher relevance, we perturb that area in the original image and forward the now perturbed image through our classification network, obtaining the output value f(x) (softmax probability for the positive class, for example). Finally, we repeat this process, but this time adding to the initial perturbation the next most relevant patch, and so on until the whole image is perturbed or a certain number of perturbation steps is reached.
+  The perturbation/feature/occlusion removal process can be described as follows: we start by first dividing the heatmaps (produced by some interpretability method under assessment) into a predefined <b>grid</b>. Afterwards, for each patch/tile of this grid we compute the average of its pixel values, so that patches with higher relevance (as indicated by the heatmap) give higher values. The next step is <b>sorting</b> these patches in <b>descending order</b> according to these previously computed values. Then, starting from the patch with higher relevance, we perturb that area in the original image and forward the now perturbed image through our classification network, obtaining the output value f(x) (softmax probability for the positive class, for example). Finally, we repeat this process, but this time adding to the initial perturbation the next most relevant patch, and so on until the whole image is perturbed or a certain number of perturbation steps is reached.
 </p>
 
 <p align="justify">
@@ -259,8 +259,24 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 </p>
 
 <p align="justify">
-  We tested several patch sizes to assess the impact of the perturbation in relation to kernel size, and other perturbation strategies (gray, white, black and random uniform) to guarantee independence from the model.
-  As expected, the average function value decreases and AOPC in- creases with the number of patches removed (by most to least relevant). Furthermore, the hybrid approach slightly outperforms the unsupervised approach, and both outperform state-of-the-art methods. We also verified that, similarly to what was described by Samek et al. [18], with a patch size much larger than the kernel size (16 × 16 and 32 × 32), AOPC scores are higher, as we are ob- taining a region score closer to the filter score, which means that perturbing that region largely impacts the filter response and, con- sequently, lowers the classification performance. Conversely, per- turbing smaller regions (4 × 4 and 8 × 8) has less impact on the filter response, leading to smaller AOPC values.
+  To quantitatively evaluate and compare our explanations, we used the method briefly explained in the <a href="https://github.com/icrto/xML#Metrics">Metrics</a>section, and present our results both in terms of average function value and AOPC. We tested different grid configurations, i.e. several patch sizes (shown in each row of the figure presented below) to assess the impact of the perturbation in relation to kernel size, as well as several perturbation strategies (different columns of the image) to guarantee independence from the model and from the average image background. As stated in the original paper by Samek at al. (<a href="https://arxiv.org/pdf/1509.06321.pdf">Evaluating the visualization of what a
+Deep Neural Network has learned</a), "We consider a region highly relevant if replacing the information in this region in arbitrary ways reduces the prediction score of the classifier; we do not want to restrict the analysis to highly specialized information removal schemes." These perturbation/removal strategies consisted in replacing every pixel of each patch (from the most to the least relevant) by either a black, white or gray pixel/patch, by applying a gaussian blur to the original patch, or by replacing each pixel from an RGB value sampled from a uniform distribution.
+ </p>
+ 
+ <p align="justify">
+  As explained by Montavon et al. in <a href="https://www.sciencedirect.com/science/article/pii/S1051200417302385">Methods for interpreting and understanding deep neural networks</a>, we usually choose to remove/occlude a patch (region of neighbouring pixels) instead of a single pixel so that we remove actual content of the image, while also avoiding introducing pixel artifacts (spurious structures). However, it is still important to keep in mind that the result of the analysis depends to some extent on the perturbation/feature/occlusion removal process. Various perturbation strategies can be used, but it should keep as much as possible the region being modified on the data manifold; this guarantees that the Classifier continues to work reliably through the whole perturbation process.
+</p>
+ 
+ <p align="justify">
+  As expected, the average function value decreases and AOPC increases with the number of patches removed. Furthermore, the hybrid approach slightly outperforms the unsupervised approach, and both clearly outperform state-of-the-art methods.
+</p>
+
+<p align="justify">
+  Relatively to patch size, we can observe that with a patch size much larger than the kernel size (16 × 16 and 32 × 32), AOPC scores are higher, as we are obtaining a region score closer to the filter score, which means that perturbing that region largely impacts the filter response and, consequently, lowers the classification performance. Conversely, per- turbing smaller regions (4 × 4 and 8 × 8) has less impact on the filter response, leading to smaller AOPC values. Furthermore, independently on the patch size, our methods present a consistent behaviour, which cannot be said of the other interpretability methods, which suggests that our approach in fact produces relevant explanations, while some of the state-of-the-art methods sometimes produce counter intuitive results (for example confront the Deconvolution method with a patch size of 4x4 with black, gray, uniform and white perturbation strategies).
+</p>
+
+<p align="justify">
+  Regarding the perturbation/removal/occlusion strategy, gaussian blurring is the one that produces the most consistent results throughout the experiments, because it is the only approach that retains local information and keeps each modified data point closer to the original data point. White and gray perturbation strategies perform the worst, as they are the ones that alter the most each pixel value (probably moving the corrupted image outside the data manifold). Finally, between these two sets we have uniform and black perturbations.
 </p>
 
 <p align="center">
@@ -285,6 +301,10 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 <img src="https://github.com/icrto/xML/blob/master/example_images/tableNIH.png" width=500>
 </p>
 
+<p align="justify">
+  We also present some of the results obtained for the NIH-NCI Cervical Cancer Dataset. Once more, the proposed approaches highlight relevant regions in a clearer way. However, sometimes non-interest regions are highlighted as well, such as specular reflections. This, together with the fact that every other interpretability method does not perform that well, leads us to believe that this particular classification model is not the best for this task, since we used a standard ResNet-18 for such a specific medical imaging problem without any custom pre-processing steps, such as reflection and/or hand/glove removal, from which we believe the classification model would certainly benefit a lot and, consequently, improve the quality of the produced explanations.
+</p>
+  
 <p align="center">
 <img width=1420 height=400 src="https://github.com/icrto/xML/blob/master/example_images/cervix_grid_explanations.png">
 </p>
