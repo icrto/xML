@@ -334,7 +334,7 @@ I'm using `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
 </p>
 
 <p align="justify">
-  For the NIH-NCI Cervical Cancer dataset, after downloading the data, your directory structure should look like this:
+  For the <b>NIH-NCI Cervical Cancer dataset</b>, after downloading the data, your directory structure should look like this:
 </p>
 
 ```
@@ -368,6 +368,11 @@ NIH-NCI
 |   |   imageID2_mask.jpg
 │   │   ... 
 ```
+
+<p align="justify">
+  Note that for every one of these datasets or other ones you wish to explore, you can always reimplement the corresponding <code>load_data_<dataset_name></code> method and add it to the <code>load_data</code> function. However, keep in mind that the <code>__getitem__</code> function assumes that you at least have a <code>dataframe</code> containing the IDs and labels of every image (check <a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py#L70">this line of the code</a>). Also, the <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py#L162">train.py</a> and <a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py#L114">test.py</a> files expect you to first call <code>load_data</code> to generate your training, validation and test dataframes, and only then create your <code>PyTorch datasets</code> and <code>dataloaders</code> with these dataframes.
+</p>
+
 Train
 
 ```
