@@ -338,7 +338,7 @@ I'm using `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
 </p>
 
 ```
-NIH-NCI
+data
 └───ALTS
 │   │   covariate_data.xls
 │   │   imageID1.jpg
@@ -378,7 +378,7 @@ NIH-NCI
 </p>
 
 <p align="justify">
-  You finally have everyhting ready to <b>train</b> the network! Do this by calling <code>train.py dataset_name</code> or by giving other arguments if you do not wish to use their default values, such as in the example below. 
+  You finally have everyhting ready to <b>train</b> the network! Do this by calling <code>train.py</code> or by giving other arguments if you do not wish to use their default values, such as in the example below. 
 </p>
 
 <p align="justify">
@@ -386,14 +386,14 @@ NIH-NCI
 </p>
 
 ```
-python3 train.py imagenetHVZ --nr_epochs 10,10,60 -bs 8 --init_bias 3.0 --loss hybrid --alpha 1.0,0.25,0.9 --beta 0.9 --gamma 1.0 -lr_clf 0.01,0,0.01 -lr_expl 0,0.01,0.01 --aug_prob 0.2 --opt sgd -clf resnet18 --early_patience 100,100,10 --folder <path_to_destination_folder>
+python3 train.py --dataset imagenetHVZ --dataset_path <path_to_dataset> --nr_epochs 10,10,60 -bs 8 --init_bias 3.0 --loss hybrid --alpha 1.0,0.25,0.9 --beta 0.9 --gamma 1.0 -lr_clf 0.01,0,0.01 -lr_expl 0,0.01,0.01 --aug_prob 0.2 --opt sgd -clf resnet18 --early_patience 100,100,10 --folder <path_to_destination_folder>
 ```
 <p align="justify">
-  To <b>test</b> your model just run <code>test.py</code> including the path to your model (a <code>.pt file</code>), the dataset and the value for α in the last training phase. The script will save the produced explanations and a <code>.txt</code> file with the report of the obtained values in the same directory where your model is stored. If you wish to define other parameter values, follow the example below.
+  To <b>test</b> your model just run <code>test.py</code> including the path to your model (a <code>.pt file</code>). The script will save the produced explanations and a <code>.txt</code> file with the report of the obtained values in the same directory where your model is stored. If you wish to define other parameter values, follow the example below.
  </p>
 
 ```
-python3 test.py <path_to_model> imagenetHVZ 0.9 -bs 8 -clf resnet18 --init_bias 3.0 --loss hybrid --beta 0.9 --gamma 1.0
+python3 test.py <path_to_model> --dataset imagenetHVZ --dataset_path <path_to_dataset> --alpha 0.9 -bs 8 -clf resnet18 --init_bias 3.0 --loss hybrid --beta 0.9 --gamma 1.0
 ```
 
 
