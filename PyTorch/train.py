@@ -41,9 +41,10 @@ parser.add_argument(
 
 # Data parameters
 parser.add_argument(
-    "dataset",
+    "--dataset",
     type=str,
-    choices=["simplified_no_colour", "NIH-NCI", "imagenetHVZ"],
+    default="imagenetHVZ",
+    choices=["synthetic", "NIH-NCI", "imagenetHVZ"],
     help="Dataset to load.",
 )
 parser.add_argument(
@@ -374,7 +375,7 @@ for phase in range(3):
         print("Train")
         model.train(train_loader, opt, device, args, phase, weights, alpha[phase])
 
-        print("Val")
+        print("Validation")
         # pass entire training set through validation function to obtain metrics at the end of the training epoch
         (
             train_global_loss,
