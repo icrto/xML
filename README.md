@@ -338,7 +338,7 @@ I'm using `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
 </p>
 
 ```
-NIH-NCI
+data
 └───ALTS
 │   │   covariate_data.xls
 │   │   imageID1.jpg
