@@ -127,18 +127,18 @@ def load_synthetic_dataset(folder, dataset='simplified_no_colour', masks=False, 
     """
     # encode class names
     classes = ['neg', 'pos']
-    if(dataset == 'simplified_no_colour'):
-        dtset_folder = os.path.join(
-            folder, 'Synthetic Dataset/simplified_no_colour')
-        test_dtset_folder = os.path.join(
-            folder, 'Synthetic Dataset/simplified_no_colour_test')
-        test_df = pd.read_excel(os.path.join(
-            test_dtset_folder, 'data.xlsx'), index_col=None)
-        test_df['imageID'] = [os.path.join(
-            test_dtset_folder, datum) for datum in test_df.imageID.values]
-        if(masks):  # also load object detection masks
-            test_df['maskID'] = [datum[:-4] +
-                                 '_mask.jpg' for datum in test_df.imageID.values]
+    
+    dtset_folder = os.path.join(
+        folder, trainval')
+    test_dtset_folder = os.path.join(
+        folder, 'test')
+    test_df = pd.read_excel(os.path.join(
+        test_dtset_folder, 'data.xlsx'), index_col=None)
+    test_df['imageID'] = [os.path.join(
+        test_dtset_folder, datum) for datum in test_df.imageID.values]
+    if(masks):  # also load object detection masks
+        test_df['maskID'] = [datum[:-4] +
+                             '_mask.jpg' for datum in test_df.imageID.values]
 
     df = pd.read_excel(os.path.join(dtset_folder, 'data.xlsx'), index_col=None)
     df['imageID'] = [os.path.join(dtset_folder, datum)
@@ -175,7 +175,7 @@ def load_NIH_NCI(folder, masks=False, class_weights=None):
     """
     # encode class names
     classes = ['healthy', 'cancer']
-    img_path = os.path.join(folder, 'DATASETS/NIH-NCI')
+    img_path = folder
     dft = pd.DataFrame()
     for subpath in ['ALTS', 'Biopsy', 'CVT', 'NHS']:
         df = pd.read_excel(os.path.join(
@@ -251,14 +251,14 @@ def load_imagenetHVZ(folder, masks=False, class_weights=None):
     le = LabelEncoder()
     le.fit(classes)
 
-    img_path = os.path.join(folder, 'DATASETS/imagenetHVZ')
+    img_path = folder
 
-    df = pd.read_csv(os.path.join(img_path, 'data_filtered.csv'))
+    df = pd.read_csv(os.path.join(img_path, 'data.csv'))
 
     img_path = os.path.join(img_path, 'images')
 
     if(masks):  # also load object detection masks
-        mask_path = os.path.join(folder, 'DATASETS/imagenetHVZ/masks')
+        mask_path = os.path.join(folder, 'masks')
         df['maskID'] = [os.path.join(mask_path, df.iloc[datum]['label'], df.iloc[datum]
                                      ['imageID'][:-5] + '_mask.JPEG') for datum in df.index.values]
     df['imageID'] = [os.path.join(
