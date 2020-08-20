@@ -370,16 +370,23 @@ NIH-NCI
 ```
 
 <p align="justify">
-  Note that for every one of these datasets or other ones you wish to explore, you can always reimplement the corresponding <code>load_data_dataset_name</code> method and add it to the <code>load_data</code> function. However, <b>keep in mind that the <code>__getitem__</code> function assumes that you at least have a <code>dataframe</code> containing the absolute path to every image and corresponding mask (only needed for the hybrid explanation loss), as well as its label</b> (check <a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py#L70">this line of the code</a>). Also, the <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py#L162">train.py</a> and <a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py#L114">test.py</a> files expect you to first call <code>load_data</code> to generate your training, validation and test dataframes, and only then create your <code>PyTorch datasets</code> and <code>dataloaders</code> with these dataframes.
+  Note that for every one of these datasets or other ones you wish to explore, you can always reimplement the corresponding <code>load_data_dataset_name</code> method and add it to the <code>load_data</code> function. However, <b>keep in mind that the <code>__getitem__</code> function assumes that you have a <code>dataframe</code> containing the absolute path to every image and corresponding mask (only needed for the hybrid explanation loss), as well as its label</b> (check <a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py#L70">this line of the code</a>). Also, the <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py#L162">train.py</a> and <a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py#L114">test.py</a> files expect you to first call <code>load_data</code> to generate your training, validation and test dataframes, and only then create your <code>PyTorch datasets</code> and <code>dataloaders</code> with these dataframes.
 </p>
 
-Train
+<p align="justify>
+  After having done this, be sure to include the name of your dataset in the <code>dataset</code> argument (check <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py#L39">here</a> and <a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py#L51">here</a>).
+</p>
+
+<p align="justify">
+  You finally have everyhting ready to train the network! Do this by calling <code>train.py dataset_name</code> or by giving other arguments if you do not wish to use their default values, such as in the example below. The rest is already taken care of! The scripts will save the produced explanations at the end of each phase, save plots of the evaluation metrics and save the model that achieved the best validation loss.
+</p>
 
 ```
 python3 train.py imagenetHVZ --nr_epochs 10,10,60 -bs 8 --init_bias 3.0 --loss hybrid --alpha 1.0,0.25,0.9 --beta 0.9 --gamma 1.0 -lr_clf 0.01,0,0.01 -lr_expl 0,0.01,0.01 --aug_prob 0.2 --opt sgd -clf resnet18 --early_patience 100,100,10 --folder <path_to_destination_folder>
 ```
-
-Test
+<p align="justify">
+  To test your model just run <code>test.py</code> including the path to your model (a <code>.pt file</code>), the dataset and the value for α in the last training phase. The script will save the produced explanations and a <code>.txt</code> file with the report of the obtained values in the same directory where your model is stored. If you wish to define other parameter values, follow the example below.
+ </p>
 
 ```
 python3 test.py <path_to_model> imagenetHVZ 0.9 -bs 8 -clf resnet18 --init_bias 3.0 --loss hybrid --beta 0.9 --gamma 1.0
