@@ -129,7 +129,7 @@ def load_synthetic_dataset(folder, dataset='simplified_no_colour', masks=False, 
     classes = ['neg', 'pos']
     
     dtset_folder = os.path.join(
-        folder, trainval')
+        folder, 'trainval')
     test_dtset_folder = os.path.join(
         folder, 'test')
     test_df = pd.read_excel(os.path.join(
