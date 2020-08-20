@@ -29,7 +29,7 @@ parser.add_argument('--folder', type=str, default='/media/TOSHIBA6T/ICRTO/JointA
                     help='Directory where images and models are to be stored.')
 
 # Data parameters
-parser.add_argument('dataset', type=str, choices=['simplified_no_colour', 'NIH-NCI', 'imagenet16', 'imagenetHVZ'],
+parser.add_argument('dataset', type=str, choices=['simplified_no_colour', 'NIH-NCI', 'imagenetHVZ'],
                     help='Dataset to load.')
 parser.add_argument('--nr_classes', type=int, default=2,
                     help='Number of target classes.')
