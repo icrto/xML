@@ -187,14 +187,14 @@ Some preliminary work was published in:
   Training this architecture involves 3 phases:
 </p>
 <ol>
-  <li><p align="justify">Only the <b>Classifier is trained</b>, while the <b>Explainer remains frozen</b>. Note that the Explainer is initialised so that the <b>initial explanations consist of white images</b> (matrices filled with 1s). We achieve this by imposing a large bias ( > 1) in the Explainer’s batch normalisation layer. This bias is controlled by the hyperparameter <code>init_bias</code>. Doing this ensures that the connections between Classifier and Explainer are bypassed. So, the Classifier is not taking the Explainer’s output into account yet, because the Explainer has not been trained at this point. The intuition is that we start by considering the whole image as an explanation (at the beginning every pixel/region is considered as relevant for the decision) and gradually eliminate irrelevant regions as redundancy is eliminated (see the GIF below).</p></li>
+  <li><p align="justify">Only the <b>Classifier is trained</b>, while the <b>Explainer remains frozen</b>. Note that the Explainer is initialised so that the <b>initial explanations consist of white images</b> (matrices filled with 1s). We achieve this by imposing a large bias ( > 1) in the Explainer’s batch normalisation layer. This bias is controlled by the hyperparameter <code>init_bias</code>. Doing this ensures that the connections between Classifier and Explainer are bypassed. So, the Classifier is not taking the Explainer’s output into account yet, because the Explainer has not been trained at this point. The intuition is that we start by considering the whole image as an explanation (at the beginning every pixel/region is considered as relevant for the decision) and gradually eliminate irrelevant regions as redundancy is decreased (see the GIF below).</p></li>
   <li><p align="justify">The process is reversed: the <b>Classifier remains frozen</b>, but the <b>Explainer learns</b> by altering its explanations and assessing the corresponding impact on the classification. This happens because the joint classification and explanation loss affects both modules (but only the Explainer is updated accordingly in this phase). In practice, the <b>Explainer is indirectly trained with the supervision of the classification component</b>.</p></li>
   <li><p align="justify">Finally the <b>whole architecture is fine-tuned end-to-end</b>. The Classifier learns with the new information provided by the Explainer, refining its classification outputs. At the same time, the Explainer continues adapting its explanations to the concepts the Classifier is learning and considers important for classifying the images.</p></li>
 </ol>
 
 <b>IMPORTANT REMARKS</b>
 <p align="justify">
-  It is imperative that <b>at the end of phase 1 the Classifier remains somewhat unstable</b>, i.e., that its loss does not plateau, so that in phase 3 both modules can learn from each other. Otherwise, in phase 3 the Classifier would not update its parameters with the new information provided by the now trained Explainer and vice-versa. Therefore, in the end, both Explainer and Classifier improve, fruit of this dynamic interaction between the two and their respective loss functions.
+  It is imperative that <b>at the end of phase 1 the Classifier remains somewhat unstable</b>, i.e. that its loss does not plateau, so that in phase 3 both modules can learn from each other. Otherwise, in phase 3 the Classifier would not update its parameters with the new information provided by the now trained Explainer and vice-versa. Therefore, in the end, both Explainer and Classifier improve, fruit of this dynamic interaction between the two and their respective loss functions.
 </p>
 
 <b>USEFUL TIPS & TRICKS</b>
@@ -212,7 +212,7 @@ Some preliminary work was published in:
  </p>
 
 <p align="justify">
-  Fine-tuning the number of epochs for each phase can be a tricky process, involving several experiments until one gains the necessary intuition for the specific data one is working with. To aliviate this problem, we present here the intuition we gained during the development of this work (however, this applied to the datasets we used, but <b>might not hold true for every dataset out there</b>). When starting exploring a new dataset, the <b>first thing</b> we did was <b>train only the classifier</b> to see which performance it could reach and if the classification network was adequate to our problem. We usually did this for many epochs (let's say around 100) and tried out different batch sizes, learning rates, optimisers and schedulers. After finding the best configuration that's usually the one we sticked with for every training phase.
+  Fine-tuning the number of epochs for each phase can be a tricky process, involving several experiments until one gains the necessary intuition for the specific data one is working with. To aliviate this problem, we present here the intuition we gained during the development of this work (however, keep in mind that this applied to the datasets we used, but <b>might not hold true for every dataset out there</b>). When starting exploring a new dataset, the <b>first thing</b> we did was <b>train only the classifier</b> to see which performance it could reach and if the classification network was adequate to our problem. We usually did this for many epochs (let's say around 100) and tried out different batch sizes, learning rates, optimisers and schedulers. After finding the best configuration that's usually the one we sticked with for every training phase.
 </p>
 
 <p align="justify">
@@ -220,7 +220,7 @@ Some preliminary work was published in:
 </p>
 
 <p align="justify">
-  Having chosen the number of epochs for our first training phase, we can move on to the second. Here we did something similar, and trained our network in this phase (always after training phase 1 as described before) for a great number of epochs to ensure that the <b>Explainer</b> was able to <b>reach a loss of 0</b>. After achieving this, we would choose the number of epochs as the one where the <b>loss had decreased considerably</b> (less than 20% of the initial value), <b>but was not 0</b> (we found out that letting the Explainer reach a loss of 0 would usually render it incapable of leaving this local minima and learning anything in the last training phase).
+  Having chosen the number of epochs for our first training phase, we can move on to the second. Here we did something similar, and trained our network in this phase (always after training phase 1 for the number of epochs defined and explained before) for a great number of epochs to ensure that the <b>Explainer</b> was able to <b>reach a loss of 0</b>. After achieving this, we would choose the number of epochs as the one where the <b>loss had decreased considerably</b> (more than 80% of the initial value - 0.2 when the loss started at about 1.0), <b>but was not 0</b> (we found out that letting the Explainer reach a loss of 0 would usually render it incapable of leaving this local minima and learning anything in the last training phase).
 </p>
 
 <p align="justify">
@@ -235,7 +235,7 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 ### ImagenetHVZ
 
 <p align="justify">
-  As the name implies, this dataset is a sub-set of ImageNet, composed only by horses and zebras (synsets n02389026 and n02391049, respectively). Of the 2600 images, we kept only the ones for which bounding boxes were available, totalling 324 images of horses and 345 images of zebras. Data was split into 85%-15% for training and testing, giving a total of 100 images for the latter. The training set was further split into 80%-20% for training and validation.
+  As the name implies, this dataset is a sub-set of <a href="http://www.image-net.org">ImageNet</a>, composed only by horses and zebras (synsets n02389026 and n02391049, respectively). Of the 2600 images, we kept only the ones for which bounding boxes were available, totalling 324 images of horses and 345 images of zebras. Data was split into 85%-15% for training and testing, giving a total of 100 images for the latter. The training set was further split into 80%-20% for training and validation.
  </p>
 
 <p align="justify">
