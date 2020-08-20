@@ -235,7 +235,7 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 ### ImagenetHVZ
 
 <p align="justify">
-  As the name implies, this dataset is a sub-set of <a href="http://www.image-net.org">ImageNet</a>, composed only by horses and zebras (synsets n02389026 and n02391049, respectively). Of the 2600 images, we kept only the ones for which bounding boxes were available, totalling 324 images of horses and 345 images of zebras. Data was split into 85%-15% for training and testing, giving a total of 100 images for the latter. The training set was further split into 80%-20% for training and validation.
+  As the name implies, this dataset is a sub-set of <a href="http://www.image-net.org">ImageNet</a>, composed only by horses and zebras (synsets n02389026 and n02391049, respectively). Of the 2600 images, we kept only the ones for which bounding boxes were available, totalling 324 images of horses and 345 images of zebras. Data was split into 85%-15% for training and testing, giving a total of 100 images for the latter. The training set was further split into 80%-20% for training and validation. You can find this dataset <a href="">here</a>.
  </p>
 
 <p align="justify">
@@ -316,6 +316,22 @@ For the PyTorch version please consult [requirements_pytorch.txt](https://github
 I'm using `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
 
 ## Usage
+
+<p align="justify">
+  Want to use this code? You are in the right place! Welcome!
+</p>
+
+<p align="justify">
+  In the <a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py">Dataset.py</a> file you can find the function <code>load_data</code> implemented, as well as individual methods to process and load our synthetic dataset, the imagenetHVZ dataset and the NIH-NCI Cervical Cancer Dataset.
+</p>
+
+<p align="justify">
+  For the <b>synthetic dataset</b>, you just need to download the <a href="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/data.zip">data</a> and point the variable <code>dataset_path</code> in <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> to the directory where you stored it.
+</p>
+
+<p align="justify">
+  The same applies for the <b>imagenetHVZ</b> dataset. Download it <a href="https://drive.google.com/file/d/1K8tZPP5uYNwHw6-DIHXBdD8aIq234yaK/view?usp=sharing">here</a> and point the variable <code>dataset_path</code> in <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> to the directory where you stored it.
+</p>
 
 Train
 
