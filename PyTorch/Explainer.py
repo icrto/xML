@@ -61,7 +61,7 @@ class Explainer(nn.Module):
             m.bias.data.fill_(self.init_bias)
 
     def forward(self, x):
-        # stores the last convolutional layer for each level (to later add it's resulting feature map to the corresponding upsampling layer as done in the original u-net)
+        # stores the last convolutional layer for each level (to later add its resulting feature map to the corresponding upsampling layer as done in the original u-net)
         last_conv_per_level = []
         x = self.conv_mod0(x)
         last_conv_per_level.append(x)

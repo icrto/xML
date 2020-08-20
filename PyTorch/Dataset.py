@@ -127,18 +127,18 @@ def load_synthetic_dataset(folder, dataset='simplified_no_colour', masks=False, 
     """
     # encode class names
     classes = ['neg', 'pos']
-    if(dataset == 'simplified_no_colour'):
-        dtset_folder = os.path.join(
-            folder, 'Synthetic Dataset/simplified_no_colour')
-        test_dtset_folder = os.path.join(
-            folder, 'Synthetic Dataset/simplified_no_colour_test')
-        test_df = pd.read_excel(os.path.join(
-            test_dtset_folder, 'data.xlsx'), index_col=None)
-        test_df['imageID'] = [os.path.join(
-            test_dtset_folder, datum) for datum in test_df.imageID.values]
-        if(masks):  # also load object detection masks
-            test_df['maskID'] = [datum[:-4] +
-                                 '_mask.jpg' for datum in test_df.imageID.values]
+    
+    dtset_folder = os.path.join(
+        folder, 'trainval')
+    test_dtset_folder = os.path.join(
+        folder, 'test')
+    test_df = pd.read_excel(os.path.join(
+        test_dtset_folder, 'data.xlsx'), index_col=None)
+    test_df['imageID'] = [os.path.join(
+        test_dtset_folder, datum) for datum in test_df.imageID.values]
+    if(masks):  # also load object detection masks
+        test_df['maskID'] = [datum[:-4] +
+                             '_mask.jpg' for datum in test_df.imageID.values]
 
     df = pd.read_excel(os.path.join(dtset_folder, 'data.xlsx'), index_col=None)
     df['imageID'] = [os.path.join(dtset_folder, datum)
@@ -175,7 +175,7 @@ def load_NIH_NCI(folder, masks=False, class_weights=None):
     """
     # encode class names
     classes = ['healthy', 'cancer']
-    img_path = os.path.join(folder, 'DATASETS/NIH-NCI')
+    img_path = folder
     dft = pd.DataFrame()
     for subpath in ['ALTS', 'Biopsy', 'CVT', 'NHS']:
         df = pd.read_excel(os.path.join(
@@ -233,69 +233,6 @@ def load_NIH_NCI(folder, masks=False, class_weights=None):
     print(len(tr_df), len(val_df), len(test_df))
     return tr_df, val_df, test_df, weights, classes
 
-
-def load_imagenet16(folder, masks=False, class_weights=None):
-    """ Loads imagenet16 dataset
-
-    Arguments:
-        folder {str} -- directory where dataset is stored
-
-    Keyword Arguments:
-        masks {bool} -- whether to load object detection masks (only need for hybrid loss) (default: {False})
-        class_weights {str} -- whether to use class weights (default: {None})
-
-    Returns:
-        [misc] -- training, validation and testing dataframes, as well as class weights and class names
-    """
-    # encode class names
-    classes = ['airplane', 'bear', 'bicycle', 'bird', 'boat', 'bottle', 'car', 'cat',
-               'chair', 'clock', 'dog', 'elephant', 'keyboard', 'knife', 'oven', 'truck']
-    le = LabelEncoder()
-    le.fit(classes)
-
-    img_path = os.path.join(folder, 'DATASETS/16-class-ImageNet')
-
-    df = pd.read_csv(os.path.join(img_path, 'data_balanced.csv'))
-
-    img_path = os.path.join(img_path, 'images')
-
-    if(masks):  # also load object detection masks
-        mask_path = os.path.join(folder, 'DATASETS/16-class-ImageNet/masks')
-        df['maskID'] = [os.path.join(mask_path, df.iloc[datum]['label'], df.iloc[datum]
-                                     ['imageID'][:-5] + '_mask.JPEG') for datum in df.index.values]
-
-    df['imageID'] = [os.path.join(
-        img_path, df.iloc[datum]['label'], df.iloc[datum]['imageID']) for datum in df.index.values]
-
-    df['label'] = le.fit_transform(df['label'])
-
-    weights = compute_class_weight(
-        class_weights, np.unique(df.label.values), df.label.values)
-
-    # stratified partitioning by ground-truth (train-test)
-    tr_sessions, test_sessions, _, _ = train_test_split(df.index.values,
-                                                        df.label.values,
-                                                        test_size=0.02,
-                                                        stratify=df.label.values, random_state=6)
-
-    # retrieve the images from sessions in each subset
-    train_df = df.loc[df.index.isin(tr_sessions)]
-    test_df = df.loc[df.index.isin(test_sessions)]
-
-    # stratified partitioning by ground-truth (train-val)
-    tr_sessions, val_sessions, _, _ = train_test_split(train_df.index.values,
-                                                       train_df.label.values,
-                                                       test_size=0.1,
-                                                       stratify=train_df.label.values, random_state=6)
-
-    tr_df = train_df.loc[train_df.index.isin(tr_sessions)]
-    val_df = train_df.loc[train_df.index.isin(val_sessions)]
-
-    print(len(tr_df), len(val_df), len(test_df))
-
-    return tr_df, val_df, test_df, weights, classes
-
-
 def load_imagenetHVZ(folder, masks=False, class_weights=None):
     """ Loads imagenetHVZ dataset
 
@@ -314,14 +251,14 @@ def load_imagenetHVZ(folder, masks=False, class_weights=None):
     le = LabelEncoder()
     le.fit(classes)
 
-    img_path = os.path.join(folder, 'DATASETS/imagenetHVZ')
+    img_path = folder
 
-    df = pd.read_csv(os.path.join(img_path, 'data_filtered.csv'))
+    df = pd.read_csv(os.path.join(img_path, 'data.csv'))
 
     img_path = os.path.join(img_path, 'images')
 
     if(masks):  # also load object detection masks
-        mask_path = os.path.join(folder, 'DATASETS/imagenetHVZ/masks')
+        mask_path = os.path.join(folder, 'masks')
         df['maskID'] = [os.path.join(mask_path, df.iloc[datum]['label'], df.iloc[datum]
                                      ['imageID'][:-5] + '_mask.JPEG') for datum in df.index.values]
     df['imageID'] = [os.path.join(
@@ -362,7 +299,7 @@ def load_data(folder, dataset='imagenetHVZ', masks=False, class_weights=None):
 
     Keyword Arguments:
         dataset {str} -- dataset to choose (default: {'imagenetHVZ'})
-        masks {bool} -- whether to load object detection masks (only need for hybrid loss) (default: {False})
+        masks {bool} -- whether to load object detection masks (only needed for hybrid loss) (default: {False})
         class_weights {str} -- whether to use class weights (default: {None})
 
     Returns:
@@ -373,7 +310,5 @@ def load_data(folder, dataset='imagenetHVZ', masks=False, class_weights=None):
         return load_synthetic_dataset(folder=folder, dataset=dataset, masks=masks, class_weights=class_weights)
     elif(dataset == 'NIH-NCI'):
         return load_NIH_NCI(folder=folder, masks=masks, class_weights=class_weights)
-    elif(dataset == 'imagenet16'):
-        return load_imagenet16(folder=folder, masks=masks, class_weights=class_weights)
     elif(dataset == 'imagenetHVZ'):
         return load_imagenetHVZ(folder=folder, masks=masks, class_weights=class_weights)
