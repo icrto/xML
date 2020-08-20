@@ -302,7 +302,7 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 </p>
 
 <p align="justify">
-  We also present some of the results obtained for the NIH-NCI Cervical Cancer Dataset. Once more, the proposed approaches highlight relevant regions in a clearer way. However, sometimes non-interest regions are highlighted as well, such as specular reflections. This, together with the fact that every other interpretability method does not perform that well, leads us to believe that this particular classification model is not the best for this task, since we used a standard ResNet-18 for such a specific medical imaging problem without any custom pre-processing steps, such as reflection and/or hand/glove removal, from which we believe the classification model would certainly benefit a lot and, consequently, improve the quality of the produced explanations.
+  We also present some of the produced explanations for this dataset. Once more, the proposed approaches highlight relevant regions in a clearer way. However, sometimes non-interest regions are highlighted as well, such as specular reflections. This, together with the fact that every other interpretability method does not perform that well, leads us to believe that this particular classification model is not the best for this task, since we used a standard ResNet-18 for such a specific medical imaging problem without any custom pre-processing steps, such as reflection and/or hand/glove removal, from which we believe the classification model would certainly benefit a lot and, consequently, improve the quality of the produced explanations.
 </p>
   
 <p align="center">
