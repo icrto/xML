@@ -276,7 +276,7 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 </p>
 
 <p align="justify">
-  Regarding the perturbation/occlusion/feature removal strategy, gaussian blurring is the one that produces the most similar results throughout the experiments, because it is the only approach that retains local information and keeps each modified data point closer to the original. White and gray perturbation strategies perform the worst, as they are the ones that alter the most each pixel value (moving the corrupted image outside the data manifold). Finally, between these two sets we have uniform and black perturbations.
+  Regarding the perturbation/occlusion/feature removal strategy, gaussian blurring is the one that produces the most similar results throughout the experiments, because it is the only approach that retains local information and keeps each modified data point closer to the original. White and gray perturbation strategies perform the worst, as they are the ones that alter the most each pixel value (moving the corrupted image outside the data manifold). Finally, between these two sets we have the uniform and black perturbation strategies.
 </p>
 
 <p align="center">
