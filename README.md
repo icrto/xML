@@ -333,6 +333,41 @@ I'm using `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
   The same applies for the <b>imagenetHVZ</b> dataset. Download it <a href="https://drive.google.com/file/d/1K8tZPP5uYNwHw6-DIHXBdD8aIq234yaK/view?usp=sharing">here</a> and point the variable <code>dataset_path</code> in <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> to the directory where you stored it.
 </p>
 
+<p align="justify">
+  For the NIH-NCI Cervical Cancer dataset, after downloading the data, your directory structure should look like this:
+</p>
+
+```
+NIH-NCI
+└───ALTS
+│   │   covariate_data.xls
+│   │   imageID1.jpg
+|   |   imageID1_mask.jpg
+│   │   imageID2.jpg
+|   |   imageID2_mask.jpg
+│   │   ... 
+└───Biopsy
+│   │   covariate_data.xls
+│   │   imageID1.jpg
+|   |   imageID1_mask.jpg
+│   │   imageID2.jpg
+|   |   imageID2_mask.jpg
+│   │   ... 
+└───CVT
+│   │   covariate_data.xls
+│   │   imageID1.jpg
+|   |   imageID1_mask.jpg
+│   │   imageID2.jpg
+|   |   imageID2_mask.jpg
+│   │   ... 
+└───NHS
+│   │   covariate_data.xls
+│   │   imageID1.jpg
+|   |   imageID1_mask.jpg
+│   │   imageID2.jpg
+|   |   imageID2_mask.jpg
+│   │   ... 
+```
 Train
 
 ```
