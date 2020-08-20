@@ -40,11 +40,10 @@ parser.add_argument(
 )
 
 # Data parameters
-<<<<<<< HEAD
 parser.add_argument(
     "dataset",
     type=str,
-    choices=["simplified_no_colour", "NIH-NCI", "imagenet16", "imagenetHVZ"],
+    choices=["simplified_no_colour", "NIH-NCI", "imagenetHVZ"],
     help="Dataset to load.",
 )
 parser.add_argument(
@@ -59,16 +58,6 @@ parser.add_argument(
     default=0,
     help="Probability of applying data augmentation to each image.",
 )
-=======
-parser.add_argument('dataset', type=str, choices=['simplified_no_colour', 'NIH-NCI', 'imagenetHVZ'],
-                    help='Dataset to load.')
-parser.add_argument('--nr_classes', type=int, default=2,
-                    help='Number of target classes.')
-parser.add_argument('--img_size', type=tuple,
-                    default=(224, 224), help='Input image size.')
-parser.add_argument('--aug_prob', type=float, default=0,
-                    help='Probability of applying data augmentation to each image.')
->>>>>>> 2c6582f40429c23fb8a3a81dff42b1196b1c1cf0
 
 # Training parameters
 parser.add_argument(
