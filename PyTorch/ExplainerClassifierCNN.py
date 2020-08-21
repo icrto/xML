@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score
 from torch import nn
 from torch.nn import functional as F
 import utils
-import Losses
+import losses
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -103,16 +103,12 @@ class ExplainerClassifierCNN(nn.Module):
         ):
             optimiser.zero_grad()
             if len(batch_masks) > 0:  # hybrid loss
-                batch_imgs, batch_labels, batch_masks = (
-                    batch_imgs.to(device),
-                    batch_labels.to(device),
-                    batch_masks.to(device),
-                )
-            else:
-                batch_imgs, batch_labels = (
-                    batch_imgs.to(device),
-                    batch_labels.to(device),
-                )
+                batch_masks = batch_masks.to(device)
+
+            batch_imgs, batch_labels = (
+                batch_imgs.to(device),
+                batch_labels.to(device),
+            )
 
             # forward pass
             batch_expls = self.explainer(batch_imgs)
@@ -122,11 +118,11 @@ class ExplainerClassifierCNN(nn.Module):
             dec_loss = dec_criterion(batch_probs, batch_labels)
 
             if args.loss == "unsupervised":
-                exp_loss = Losses.batch_unsupervised_explanation_loss(
+                exp_loss = losses.batch_unsupervised_explanation_loss(
                     batch_expls, float(args.beta), reduction="mean"
                 )
             elif args.loss == "hybrid":
-                exp_loss = Losses.batch_hybrid_explanation_loss(
+                exp_loss = losses.batch_hybrid_explanation_loss(
                     batch_expls,
                     batch_masks,
                     float(args.beta),
@@ -179,11 +175,11 @@ class ExplainerClassifierCNN(nn.Module):
                 batch_dec_loss = dec_criterion(batch_probs, batch_labels)
 
                 if args.loss == "unsupervised":
-                    batch_exp_loss = Losses.batch_unsupervised_explanation_loss(
+                    batch_exp_loss = losses.batch_unsupervised_explanation_loss(
                         batch_expls, float(args.beta), reduction="sum"
                     )
                 elif args.loss == "hybrid":
-                    batch_exp_loss = Losses.batch_hybrid_explanation_loss(
+                    batch_exp_loss = losses.batch_hybrid_explanation_loss(
                         batch_expls,
                         batch_masks,
                         float(args.beta),
@@ -253,11 +249,11 @@ class ExplainerClassifierCNN(nn.Module):
                 batch_dec_loss = dec_criterion(batch_probs, batch_labels)
 
                 if args.loss == "unsupervised":
-                    batch_exp_loss = Losses.batch_unsupervised_explanation_loss(
+                    batch_exp_loss = losses.batch_unsupervised_explanation_loss(
                         batch_expls, float(args.beta), reduction="sum"
                     )
                 elif args.loss == "hybrid":
-                    batch_exp_loss = Losses.batch_hybrid_explanation_loss(
+                    batch_exp_loss = losses.batch_hybrid_explanation_loss(
                         batch_expls,
                         batch_masks,
                         float(args.beta),

@@ -7,7 +7,14 @@ class Explainer(nn.Module):
     """ Class Explainer
     """
 
-    def __init__(self, in_channels=3, exp_conv_filter_size=(3, 3), exp_pool_size=2, img_size=(224, 224), init_bias=10.0):
+    def __init__(
+        self,
+        in_channels=3,
+        exp_conv_filter_size=(3, 3),
+        exp_pool_size=2,
+        img_size=(224, 224),
+        init_bias=10.0,
+    ):
 
         super(Explainer, self).__init__()
         self.in_channels = in_channels
@@ -16,32 +23,29 @@ class Explainer(nn.Module):
         self.img_size = img_size
         self.init_bias = init_bias
 
-        self.conv_mod0 = ConvMod(self.in_channels, 32,
-                                 self.exp_conv_filter_size)
+        self.conv_mod0 = ConvMod(self.in_channels, 32, self.exp_conv_filter_size)
         self.pool0 = nn.MaxPool2d(self.exp_pool_size)
 
-        self.conv_mod1 = ConvMod(
-            32, 64, self.exp_conv_filter_size)
+        self.conv_mod1 = ConvMod(32, 64, self.exp_conv_filter_size)
         self.pool1 = nn.MaxPool2d(self.exp_pool_size)
 
-        self.conv_mod2 = ConvMod(
-            64, 128, self.exp_conv_filter_size)
+        self.conv_mod2 = ConvMod(64, 128, self.exp_conv_filter_size)
         self.pool2 = nn.MaxPool2d(self.exp_pool_size)
 
         self.tr_conv0 = nn.ConvTranspose2d(
-            128, 128, kernel_size=self.exp_pool_size, stride=self.exp_pool_size)
-        self.conv_mod3 = ConvMod(
-            128, 128, self.exp_conv_filter_size)
+            128, 128, kernel_size=self.exp_pool_size, stride=self.exp_pool_size
+        )
+        self.conv_mod3 = ConvMod(128, 128, self.exp_conv_filter_size)
 
         self.tr_conv1 = nn.ConvTranspose2d(
-            128, 64, kernel_size=self.exp_pool_size, stride=self.exp_pool_size)
-        self.conv_mod4 = ConvMod(
-            64, 64, self.exp_conv_filter_size)
+            128, 64, kernel_size=self.exp_pool_size, stride=self.exp_pool_size
+        )
+        self.conv_mod4 = ConvMod(64, 64, self.exp_conv_filter_size)
 
         self.tr_conv2 = nn.ConvTranspose2d(
-            64, 32, kernel_size=self.exp_pool_size, stride=self.exp_pool_size)
-        self.conv_mod5 = ConvMod(
-            32, 32, self.exp_conv_filter_size)
+            64, 32, kernel_size=self.exp_pool_size, stride=self.exp_pool_size
+        )
+        self.conv_mod5 = ConvMod(32, 32, self.exp_conv_filter_size)
 
         self.conv_1x1 = nn.Conv2d(32, 1, kernel_size=1)
         self.bn = nn.BatchNorm2d(1)
@@ -57,7 +61,7 @@ class Explainer(nn.Module):
         Arguments:
             m {torch.nn.Layer} -- layer in which we want to modify the initial bias value
         """
-        if(type(m) == nn.BatchNorm2d):
+        if type(m) == nn.BatchNorm2d:
             m.bias.data.fill_(self.init_bias)
 
     def forward(self, x):
