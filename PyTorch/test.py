@@ -115,27 +115,18 @@ timestamp = path.split("/")[-1]
 
 # verify loss parameters
 loss = args.loss
+if args.beta is None:
+    print("Please define a value for beta.")
+    sys.exit(-1)
+
 masks = False
 if loss == "hybrid":
     masks = True  # ensure that the dataloader returns object detection masks
-
-if loss == "unsupervised":
-    if args.beta is None:
-        print("Please define a value for beta.")
-        sys.exit(-1)
-elif loss == "hybrid":
-    if args.beta is None:
-        print("Please define a value for beta.")
-        sys.exit(-1)
     if args.gamma is None:
         print("Please define a value for gamma.")
         sys.exit(-1)
-else:
-    print("Invalid loss function. Try again with <unsup> or <hybrid>.")
-    sys.exit(-1)
 
 # instantiate model class and load model to test
-
 model = ExplainerClassifierCNN(
     num_classes=args.nr_classes,
     img_size=args.img_size,

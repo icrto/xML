@@ -88,7 +88,6 @@ class Dataset(torch.utils.data.Dataset):
     ):
         super(Dataset, self).__init__()
         self.df = df
-        self.len = len(self.df)
         self.preprocess = preprocess
         self.masks = masks
         self.img_size = img_size
@@ -135,9 +134,6 @@ class Dataset(torch.utils.data.Dataset):
 
         return img, label, img_name, mask
 
-    def __len__(self):
-        return self.len
-
 
 def load_synthetic_dataset(folder, masks=False, class_weights=None):
     """ Loads synthetic dataset
@@ -176,7 +172,7 @@ def load_synthetic_dataset(folder, masks=False, class_weights=None):
         df["maskID"] = [datum[:-4] + "_mask.jpg" for datum in df.imageID.values]
 
     weights = compute_class_weight(
-        class_weights, np.unique(df.label.values), df.label.values
+        class_weights, classes=np.unique(df.label.values), y=df.label.values
     )
 
     # stratified partitioning by ground-truth (train-test)
@@ -240,7 +236,7 @@ def load_NIH_NCI(folder, masks=False, class_weights=None):
     df_["sessionID"] = [index for index, _ in enumerate(dft.GG_PATIENT_ID)]
 
     weights = compute_class_weight(
-        class_weights, np.unique(df_.label.values), df_.label.values
+        class_weights, classes=np.unique(df.label.values), y=df.label.values
     )
 
     session_df = df_[["sessionID", "label"]].groupby("sessionID").agg("max")
@@ -317,7 +313,7 @@ def load_imagenetHVZ(folder, masks=False, class_weights=None):
     df["label"] = le.fit_transform(df["label"])
 
     weights = compute_class_weight(
-        class_weights, np.unique(df.label.values), df.label.values
+        class_weights, classes=np.unique(df.label.values), y=df.label.values
     )
 
     tr_sessions, test_sessions, _, _ = train_test_split(
