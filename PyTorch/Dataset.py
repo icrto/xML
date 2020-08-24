@@ -92,6 +92,10 @@ class Dataset(torch.utils.data.Dataset):
         self.masks = masks
         self.img_size = img_size
         self.aug_prob = aug_prob
+        self.len = len(self.df)
+
+    def __len__(self):
+        return self.len
 
     def __getitem__(self, index):
         img_name = self.df.iloc[index]["imageID"]
