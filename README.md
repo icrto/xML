@@ -187,7 +187,7 @@ Some preliminary work was published in:
   Training this architecture involves 3 phases:
 </p>
 <ol>
-  <li><p align="justify">Only the <b>Classifier is trained</b>, while the <b>Explainer remains frozen</b>. Note that the Explainer is initialised so that the <b>initial explanations consist of white images</b> (matrices filled with 1s). We achieve this by imposing a large bias ( > 1) in the Explainer’s batch normalisation layer. This bias is controlled by the hyperparameter <code>init_bias</code>. Doing this ensures that the connections between Classifier and Explainer are bypassed. So, the Classifier is not taking the Explainer’s output into account yet, because the Explainer has not been trained at this point. The intuition is that we start by considering the whole image as an explanation (at the beginning every pixel/region is considered as relevant for the decision) and gradually eliminate irrelevant regions as redundancy is decreased (see the GIF below).</p></li>
+  <li><p align="justify">Only the <b>Classifier is trained</b>, while the <b>Explainer remains frozen</b>. Note that the Explainer is initialised so that the <b>initial explanations consist of white images</b> (matrices filled with 1s). We achieve this by imposing a large bias ( > 1) in the Explainer’s batch normalisation layer. This bias is controlled by the hyperparameter <code>init_bias</code>. Doing this ensures that the connections between Classifier and Explainer are bypassed. So, the Classifier is not taking the Explainer’s output into account yet, because the Explainer has not been trained at this point. The intuition is that we start by considering the whole image as an explanation (at the beginning every pixel/region is considered as relevant for the decision) and gradually eliminate irrelevant regions as redundancy is decreased (see the GIFs below).</p></li>
   <li><p align="justify">The process is reversed: the <b>Classifier remains frozen</b>, but the <b>Explainer learns</b> by altering its explanations and assessing the corresponding impact on the classification. This happens because the joint classification and explanation loss affects both modules (but only the Explainer is updated accordingly in this phase). In practice, the <b>Explainer is indirectly trained with the supervision of the classification component</b>.</p></li>
   <li><p align="justify">Finally the <b>whole architecture is fine-tuned end-to-end</b>. The Classifier learns with the new information provided by the Explainer, refining its classification outputs. At the same time, the Explainer continues adapting its explanations to the concepts the Classifier is learning and considers important for classifying the images.</p></li>
 </ol>
@@ -329,7 +329,7 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 
 For the PyTorch version please consult [requirements_pytorch.txt](https://github.com/icrto/xML/blob/master/requirements_pytorch.txt). 
 
-I'm using `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
+We used `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
 
 ## Usage
 
