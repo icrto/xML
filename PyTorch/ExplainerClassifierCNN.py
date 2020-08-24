@@ -121,15 +121,11 @@ class ExplainerClassifierCNN(nn.Module):
 
             if args.loss == "unsupervised":
                 exp_loss = losses.batch_unsupervised_explanation_loss(
-                    batch_expls, float(args.beta), reduction="mean"
+                    batch_expls, args.beta, reduction="mean"
                 )
             elif args.loss == "hybrid":
                 exp_loss = losses.batch_hybrid_explanation_loss(
-                    batch_expls,
-                    batch_masks,
-                    float(args.beta),
-                    float(args.gamma),
-                    reduction="mean",
+                    batch_expls, batch_masks, args.beta, args.gamma, reduction="mean",
                 )
 
             loss = float(alpha) * dec_loss + (1 - float(alpha)) * exp_loss
@@ -178,14 +174,14 @@ class ExplainerClassifierCNN(nn.Module):
 
                 if args.loss == "unsupervised":
                     batch_exp_loss = losses.batch_unsupervised_explanation_loss(
-                        batch_expls, float(args.beta), reduction="sum"
+                        batch_expls, args.beta, reduction="sum"
                     )
                 elif args.loss == "hybrid":
                     batch_exp_loss = losses.batch_hybrid_explanation_loss(
                         batch_expls,
                         batch_masks,
-                        float(args.beta),
-                        float(args.gamma),
+                        args.beta,
+                        args.gamma,
                         reduction="sum",
                     )
 
@@ -252,14 +248,14 @@ class ExplainerClassifierCNN(nn.Module):
 
                 if args.loss == "unsupervised":
                     batch_exp_loss = losses.batch_unsupervised_explanation_loss(
-                        batch_expls, float(args.beta), reduction="sum"
+                        batch_expls, args.beta, reduction="sum"
                     )
                 elif args.loss == "hybrid":
                     batch_exp_loss = losses.batch_hybrid_explanation_loss(
                         batch_expls,
                         batch_masks,
-                        float(args.beta),
-                        float(args.gamma),
+                        args.beta,
+                        args.gamma,
                         reduction="sum",
                     )
 

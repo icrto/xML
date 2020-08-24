@@ -106,11 +106,11 @@ parser.add_argument(
     help="Loss = alpha * Lclassif + (1-alpha) * Lexplic for each phase, for example: 1.0,0.0,0.9.",
 )
 parser.add_argument(
-    "--beta", type=str, help="Lexplic_unsup = beta * L1 + (1-beta) * Total Variation"
+    "--beta", type=float, help="Lexplic_unsup = beta * L1 + (1-beta) * Total Variation"
 )
 parser.add_argument(
     "--gamma",
-    type=str,
+    type=float,
     help="Lexplic_hybrid = beta * L1 + (1-beta) * Total Variation + gamma* Weakly Loss",
 )
 parser.add_argument(
