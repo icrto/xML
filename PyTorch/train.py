@@ -245,7 +245,7 @@ model.to(device)
 
 # save a summary of the model used
 summary(
-    model.decmaker,
+    model.classifier,
     [(3, 224, 224), (1, 224, 224)],
     filename=os.path.join(path, timestamp + "_model_dec_info.txt"),
 )
@@ -319,13 +319,13 @@ for phase in range(3):
             [
                 "epoch",
                 "train_global_loss",
-                "train_decmaker_loss",
+                "train_classifier_loss",
                 "train_explainer_loss",
-                "train_decmaker_acc",
+                "train_classifier_acc",
                 "val_global_loss",
-                "val_decmaker_loss",
+                "val_classifier_loss",
                 "val_explainer_loss",
-                "val_decmaker_acc",
+                "val_classifier_acc",
             ]
         )
 
@@ -333,7 +333,7 @@ for phase in range(3):
     if args.opt == "adadelta":
         opt = optim.Adadelta(
             [
-                {"params": model.decmaker.parameters(), "lr": lr_clf[phase]},
+                {"params": model.classifier.parameters(), "lr": lr_clf[phase]},
                 {"params": model.explainer.parameters(), "lr": lr_expl[phase]},
             ],
             weight_decay=args.decay,
@@ -341,7 +341,7 @@ for phase in range(3):
     else:
         opt = optim.SGD(
             [
-                {"params": model.decmaker.parameters(), "lr": lr_clf[phase]},
+                {"params": model.classifier.parameters(), "lr": lr_clf[phase]},
                 {"params": model.explainer.parameters(), "lr": lr_expl[phase]},
             ],
             weight_decay=args.decay,
@@ -372,35 +372,40 @@ for phase in range(3):
         (
             train_global_loss,
             train_explainer_loss,
-            train_decmaker_loss,
-            train_decmaker_acc,
+            train_classifier_loss,
+            train_classifier_acc,
         ) = model.validation(train_loader, device, args, alpha[phase])
         print(
             "Train Loss %f \tTrain Exp Loss %f \tTrain Dec Loss %f \tTrain Acc %f"
             % (
                 train_global_loss,
                 train_explainer_loss,
-                train_decmaker_loss,
-                train_decmaker_acc,
+                train_classifier_loss,
+                train_classifier_acc,
             )
         )
 
         (
             val_global_loss,
             val_explainer_loss,
-            val_decmaker_loss,
-            val_decmaker_acc,
+            val_classifier_loss,
+            val_classifier_acc,
         ) = model.validation(val_loader, device, args, alpha[phase])
         print(
             "Val Loss %f \tVal Exp Loss %f \tVal Dec Loss %f \tVal Acc %f"
-            % (val_global_loss, val_explainer_loss, val_decmaker_loss, val_decmaker_acc)
+            % (
+                val_global_loss,
+                val_explainer_loss,
+                val_classifier_loss,
+                val_classifier_acc,
+            )
         )
 
         print()
 
         # save model and epoch metrics
         model.checkpoint(
-            checkpoint_filename, epoch, val_global_loss, val_decmaker_acc, opt
+            checkpoint_filename, epoch, val_global_loss, val_classifier_acc, opt
         )
 
         with open(history_file, "a+") as f:
@@ -409,13 +414,13 @@ for phase in range(3):
                 [
                     epoch,
                     train_global_loss,
-                    train_decmaker_loss,
+                    train_classifier_loss,
                     train_explainer_loss,
-                    train_decmaker_acc,
+                    train_classifier_acc,
                     val_global_loss,
-                    val_decmaker_loss,
+                    val_classifier_loss,
                     val_explainer_loss,
-                    val_decmaker_acc,
+                    val_classifier_acc,
                 ]
             )
 
@@ -436,9 +441,9 @@ for phase in range(3):
     utils.plot_metric_train_val(
         epoch + 1,
         history_file,
-        "decmaker_loss",
+        "classifier_loss",
         path,
-        os.path.join(path, timestamp + "_phase" + str(phase) + "_decmaker_loss.png"),
+        os.path.join(path, timestamp + "_phase" + str(phase) + "_classifier_loss.png"),
         "Classifier Loss",
     )
     utils.plot_metric_train_val(
@@ -460,9 +465,9 @@ for phase in range(3):
     utils.plot_metric_train_val(
         epoch + 1,
         history_file,
-        "decmaker_acc",
+        "classifier_acc",
         path,
-        os.path.join(path, timestamp + "_phase" + str(phase) + "_decmaker_acc.png"),
+        os.path.join(path, timestamp + "_phase" + str(phase) + "_classifier_acc.png"),
         "Accuracy",
     )
     model.save_explanations(

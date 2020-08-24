@@ -37,42 +37,44 @@ class ExplainerClassifierCNN(nn.Module):
 
         # classifier
         if "resnet152" in self.clf.lower():
-            self.decmaker = resnet152(
+            self.classifier = resnet152(
                 pretrained=self.pretrained,
                 progress=True,
                 img_size=img_size,
                 num_classes=num_classes,
             )
         elif "resnet101" in self.clf.lower():
-            self.decmaker = resnet101(
+            self.classifier = resnet101(
                 pretrained=self.pretrained,
                 progress=True,
                 img_size=img_size,
                 num_classes=num_classes,
             )
         elif "resnet50" in self.clf.lower():
-            self.decmaker = resnet50(
+            self.classifier = resnet50(
                 pretrained=self.pretrained,
                 progress=True,
                 img_size=img_size,
                 num_classes=num_classes,
             )
         elif "resnet34" in self.clf.lower():
-            self.decmaker = resnet34(
+            self.classifier = resnet34(
                 pretrained=self.pretrained,
                 progress=True,
                 img_size=img_size,
                 num_classes=num_classes,
             )
         elif "resnet18" in self.clf.lower():
-            self.decmaker = resnet18(
+            self.classifier = resnet18(
                 pretrained=self.pretrained,
                 progress=True,
                 img_size=img_size,
                 num_classes=num_classes,
             )
         else:
-            self.decmaker = VGGClf(img_size=self.img_size, num_classes=self.num_classes)
+            self.classifier = VGGClf(
+                img_size=self.img_size, num_classes=self.num_classes
+            )
 
         # explainer
         self.explainer = Explainer(img_size=self.img_size, init_bias=self.init_bias)
@@ -81,7 +83,7 @@ class ExplainerClassifierCNN(nn.Module):
         self, dataloader, optimiser, device, args, phase, weights, alpha, disable=False
     ):
 
-        self.decmaker.train()
+        self.classifier.train()
         self.explainer.train()
 
         dec_criterion = torch.nn.CrossEntropyLoss(reduction="mean", weight=weights)
@@ -93,10 +95,10 @@ class ExplainerClassifierCNN(nn.Module):
         elif phase == 1:
             # unfreeze explainer and freeze classifier
             utils.unfreeze(self.explainer)
-            utils.freeze(self.decmaker)
+            utils.freeze(self.classifier)
         elif phase == 2:
             # unfreeze classifier
-            utils.unfreeze(self.decmaker)
+            utils.unfreeze(self.classifier)
 
         for batch_imgs, batch_labels, _, batch_masks in tqdm(
             dataloader, disable=disable
@@ -112,7 +114,7 @@ class ExplainerClassifierCNN(nn.Module):
 
             # forward pass
             batch_expls = self.explainer(batch_imgs)
-            batch_probs = self.decmaker(batch_imgs, batch_expls)
+            batch_probs = self.classifier(batch_imgs, batch_expls)
 
             # losses computation
             dec_loss = dec_criterion(batch_probs, batch_labels)
@@ -137,7 +139,7 @@ class ExplainerClassifierCNN(nn.Module):
 
     def validation(self, dataloader, device, args, alpha, disable=False):
 
-        self.decmaker.eval()
+        self.classifier.eval()
         self.explainer.eval()
 
         val_loss = 0
@@ -169,7 +171,7 @@ class ExplainerClassifierCNN(nn.Module):
 
                 # forward pass
                 batch_expls = self.explainer(batch_imgs)
-                batch_probs = self.decmaker(batch_imgs, batch_expls)
+                batch_probs = self.classifier(batch_imgs, batch_expls)
 
                 # losses computation
                 batch_dec_loss = dec_criterion(batch_probs, batch_labels)
@@ -210,7 +212,7 @@ class ExplainerClassifierCNN(nn.Module):
 
     def test(self, dataloader, device, args, alpha, disable=False):
 
-        self.decmaker.eval()
+        self.classifier.eval()
         self.explainer.eval()
 
         val_loss = 0
@@ -243,7 +245,7 @@ class ExplainerClassifierCNN(nn.Module):
 
                 # forward pass
                 batch_expls = self.explainer(batch_imgs)
-                batch_probs = self.decmaker(batch_imgs, batch_expls)
+                batch_probs = self.classifier(batch_imgs, batch_expls)
 
                 # losses computation
                 batch_dec_loss = dec_criterion(batch_probs, batch_labels)
@@ -326,7 +328,7 @@ class ExplainerClassifierCNN(nn.Module):
             mode = "default"
 
         # puts model in eval mode
-        self.decmaker.eval()
+        self.classifier.eval()
         self.explainer.eval()
 
         print("\nSAVING EXPLANATIONS")
@@ -344,7 +346,7 @@ class ExplainerClassifierCNN(nn.Module):
 
                 # forward pass to predict classification output and the corresponding explanation
                 batch_expls = self.explainer(batch_imgs)
-                batch_probs = self.decmaker(batch_imgs, batch_expls)
+                batch_probs = self.classifier(batch_imgs, batch_expls)
                 batch_probs = F.softmax(batch_probs, dim=1)
 
                 for idx, img in enumerate(batch_imgs):  # transverses the batch
@@ -450,9 +452,9 @@ class ExplainerClassifierCNN(nn.Module):
             "epoch": epoch,
             "best_loss": batch_loss,
             "best_acc": batch_acc,
-            "decmaker": self.decmaker.module.state_dict()
-            if type(self.decmaker) is nn.parallel.DistributedDataParallel
-            else self.decmaker.state_dict(),
+            "classifier": self.classifier.module.state_dict()
+            if type(self.classifier) is nn.parallel.DistributedDataParallel
+            else self.classifier.state_dict(),
             "explainer": self.explainer.module.state_dict()
             if type(self.explainer) is nn.parallel.DistributedDataParallel
             else self.explainer.state_dict(),

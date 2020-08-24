@@ -139,7 +139,7 @@ ckpt_epoch = ckpt["epoch"]
 ckpt_loss = ckpt["best_loss"]
 ckpt_acc = ckpt["best_acc"]
 
-model.decmaker.load_state_dict(ckpt["decmaker"])
+model.classifier.load_state_dict(ckpt["classifier"])
 model.explainer.load_state_dict(ckpt["explainer"])
 model.to(device)
 
@@ -171,8 +171,8 @@ test_loader = DataLoader(
 (
     test_global_loss,
     test_explainer_loss,
-    test_decmaker_loss,
-    test_decmaker_acc,
+    test_classifier_loss,
+    test_classifier_acc,
     whole_probs,
     whole_preds,
     whole_labels,
@@ -194,7 +194,7 @@ else:  # binary classification
 
 print(
     "Test Loss %f\tTest Exp Loss %f\tTest Dec Loss %f\tTest Acc %f"
-    % (test_global_loss, test_explainer_loss, test_decmaker_loss, test_decmaker_acc)
+    % (test_global_loss, test_explainer_loss, test_classifier_loss, test_classifier_acc)
 )
 print()
 
@@ -208,8 +208,8 @@ with open(os.path.join(path, "test_stats_best_loss.txt"), "w") as f:
             ckpt_acc,
             test_global_loss,
             test_explainer_loss,
-            test_decmaker_loss,
-            test_decmaker_acc,
+            test_classifier_loss,
+            test_classifier_acc,
         ),
         file=f,
     )
