@@ -192,6 +192,22 @@ Some preliminary work was published in:
   <li><p align="justify">Finally the <b>whole architecture is fine-tuned end-to-end</b>. The Classifier learns with the new information provided by the Explainer, refining its classification outputs. At the same time, the Explainer continues adapting its explanations to the concepts the Classifier is learning and considers important for classifying the images.</p></li>
 </ol>
 
+<p align="center"
+<img src="https://github.com/icrto/xML/blob/master/example_images/unsupervised_phase1.gif">
+</p>
+
+<p align="center"
+<img src="https://github.com/icrto/xML/blob/master/example_images/unsupervised_phase2.gif">
+</p>
+
+<p align="center"
+<img src="https://github.com/icrto/xML/blob/master/example_images/hybrid_phase1.gif">
+</p>
+
+<p align="center"
+<img src="https://github.com/icrto/xML/blob/master/example_images/hybrid_phase2.gif">
+</p>
+
 <b>IMPORTANT REMARKS</b>
 <p align="justify">
   It is imperative that <b>at the end of phase 1 the Classifier remains somewhat unstable</b>, i.e. that its loss does not plateau, so that in phase 3 both modules can learn from each other. Otherwise, in phase 3 the Classifier would not update its parameters with the new information provided by the now trained Explainer and vice-versa. Therefore, in the end, both Explainer and Classifier improve, fruit of this dynamic interaction between the two and their respective loss functions.
