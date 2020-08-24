@@ -192,19 +192,19 @@ Some preliminary work was published in:
   <li><p align="justify">Finally the <b>whole architecture is fine-tuned end-to-end</b>. The Classifier learns with the new information provided by the Explainer, refining its classification outputs. At the same time, the Explainer continues adapting its explanations to the concepts the Classifier is learning and considers important for classifying the images.</p></li>
 </ol>
 
-<p align="center"
+<p align="center">
 <img src="https://github.com/icrto/xML/blob/master/example_images/unsupervised_phase1.gif">
 </p>
 
-<p align="center"
+<p align="center">
 <img src="https://github.com/icrto/xML/blob/master/example_images/unsupervised_phase2.gif">
 </p>
 
-<p align="center"
+<p align="center">
 <img src="https://github.com/icrto/xML/blob/master/example_images/hybrid_phase1.gif">
 </p>
 
-<p align="center"
+<p align="center">
 <img src="https://github.com/icrto/xML/blob/master/example_images/hybrid_phase2.gif">
 </p>
 
