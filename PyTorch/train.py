@@ -51,7 +51,7 @@ parser.add_argument(
     "--nr_classes", type=int, default=2, help="Number of target classes."
 )
 parser.add_argument(
-    "--img_size", type=tuple, default=(224, 224), help="Input image size."
+    "--img_size", nargs="+", type=int, default=[224, 224], help="Input image size."
 )
 parser.add_argument(
     "--aug_prob",
@@ -225,6 +225,8 @@ alpha = np.array([float(x) for x in alphas])
 early_patience = args.early_patience.split(",")
 early_patience = np.array([int(x) for x in early_patience])
 
+img_size = tuple(args.img_size)
+
 # create folder to store the results and models
 folder = args.folder
 timestamp, path = utils.create_folder(folder)
@@ -236,7 +238,7 @@ with open(os.path.join(path, timestamp + "_train_parameters_summary.txt"), "w") 
 # instantiate model class and put model in GPU (if GPU available)
 model = ExplainerClassifierCNN(
     num_classes=args.nr_classes,
-    img_size=args.img_size,
+    img_size=img_size,
     clf=args.classifier,
     init_bias=args.init_bias,
     pretrained=args.pretrained,
@@ -270,10 +272,8 @@ tr_df, val_df, _, weights, classes = load_data(
 )
 weights = torch.FloatTensor(weights).to(device)
 
-train_dataset = Dataset(
-    tr_df, masks=masks, img_size=args.img_size, aug_prob=args.aug_prob
-)
-val_dataset = Dataset(val_df, masks=masks, img_size=args.img_size, aug_prob=0)
+train_dataset = Dataset(tr_df, masks=masks, img_size=img_size, aug_prob=args.aug_prob)
+val_dataset = Dataset(val_df, masks=masks, img_size=img_size, aug_prob=0)
 
 train_loader = DataLoader(
     train_dataset,

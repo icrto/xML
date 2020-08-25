@@ -93,8 +93,8 @@ def plot_metric_train_val(nr_epochs, history_csv, metric, path, filename, plot_t
 
     hist = pd.read_csv(history_csv)
     x_values = np.linspace(1, nr_epochs, nr_epochs)
-    plt.plot(x_values, hist[str("train_" + metric)], "--")
-    plt.plot(x_values, hist[str("val_" + metric)], ":")
+    plt.plot(x_values, hist[str("train_" + metric)])
+    plt.plot(x_values, hist[str("val_" + metric)])
     plt.title(plot_title)
     if "loss" in metric:
         plt.ylabel("Loss")

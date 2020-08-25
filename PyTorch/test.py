@@ -45,9 +45,8 @@ parser.add_argument(
     "--nr_classes", type=int, default=2, help="Number of target classes."
 )
 parser.add_argument(
-    "--img_size", type=tuple, default=(224, 224), help="Input image size."
+    "--img_size", nargs="+", type=int, default=[224, 224], help="Input image size."
 )
-
 
 # Testing parameters
 parser.add_argument("-bs", "--batch_size", type=int, default=32, help="Batch size.")
@@ -75,7 +74,7 @@ parser.add_argument(
     help="Specifiy which loss to use. Either hybrid or unsupervised.",
 )
 parser.add_argument(
-    "--alfa",
+    "--alpha",
     type=float,
     default=0.9,
     help="Alfa of the last training phase. Loss = alfa * Lclassif + (1-alfa) * Lexplic",
@@ -126,10 +125,12 @@ if loss == "hybrid":
         print("Please define a value for gamma.")
         sys.exit(-1)
 
+img_size = tuple(args.img_size)
+
 # instantiate model class and load model to test
 model = ExplainerClassifierCNN(
     num_classes=args.nr_classes,
-    img_size=args.img_size,
+    img_size=img_size,
     clf=args.classifier,
     init_bias=args.init_bias,
 )
@@ -157,7 +158,7 @@ _, _, test_df, weights, classes = load_data(
 )
 weights = torch.FloatTensor(weights).to(device)
 
-test_dataset = Dataset(test_df, masks=masks, img_size=args.img_size, aug_prob=0)
+test_dataset = Dataset(test_df, masks=masks, img_size=img_size, aug_prob=0)
 test_loader = DataLoader(
     test_dataset,
     batch_size=args.batch_size,
@@ -174,10 +175,9 @@ test_loader = DataLoader(
     test_classifier_loss,
     test_classifier_acc,
     whole_probs,
-    whole_preds,
+    _,
     whole_labels,
-) = model.test(test_loader, device, args, args.alfa)
-
+) = model.test(test_loader, device, args, args.alpha)
 
 if args.nr_classes > 2:  # multiclass
     utils.plot_roc_curve_multiclass(
@@ -199,7 +199,7 @@ print(
 print()
 
 # save results
-with open(os.path.join(path, "test_stats_best_loss.txt"), "w") as f:
+with open(os.path.join(path, timestamp + "test_stats_best_loss.txt"), "w") as f:
     print(
         "Epoch %f\tCkpt Loss %f\tCkpt Acc %f\tTest Loss %f\tTest Exp Loss %f\tTest Dec Loss %f\tTest Acc %f"
         % (
