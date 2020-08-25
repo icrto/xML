@@ -1,274 +1,364 @@
-#!/usr/bin/env python
-# coding: utf-8
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import os
-import gc
 import sys
 from ExplainerClassifierCNN import ExplainerClassifierCNN
 import utils
 import argparse
+from dataset import load_data, DataGenerator
 import numpy as np
-np.random.seed(42)
-import random as rn
-rn.seed(1234)
-import itertools as it
-from tensorflow.python.client import device_lib
-from keras import backend as K
+from losses import unsupervised_explanation_loss, hybrid_explanation_loss
+from tensorflow.keras.optimizers import Adadelta, SGD
 
+np.random.seed(0)
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument("--gpu", type=str, default='1',
-                    help="Which gpus to use in CUDA_VISIBLE_DEVICES.")
-parser.add_argument("--nr_gpus", type=int, default=1,
-                    help="Number of gpus to use.")                    
-parser.add_argument("dataset", type=str,
-                    help="Dataset to load.")
-parser.add_argument("--dataset_path", type=str, default="/media/TOSHIBA6T/ICRTO",
-                    help="Folder where dataset is located.")                  
-parser.add_argument("--nr_classes", type=int, default=2,
-                    help="Number of target classes.")
-parser.add_argument("nr_epochs", type=str,
-                    help="Number of epochs for each of the 3 training phases as an array, for example: 50,100,50.")
-parser.add_argument("-bs", "--batch_size", type=int, default=32,
-                    help="Training batch size.")
-parser.add_argument("alfas", type=str,
-                    help="Loss = alfa * Lclassif + (1-alfa) * Lexplic")                   
-parser.add_argument("--betas", type=str,
-                    help="Lexplic_unsup = beta * L1 + (1-beta) * Total Variation")    
-parser.add_argument("--betas1", type=str,
-                    help="Lexplic_hybrid = beta1 * L1 + beta2 * Total Variation + (1-beta1-beta2)* Weakly Loss")  
-parser.add_argument("--betas2", type=str,
-                    help="Lexplic_hybrid = beta1 * L1 + beta2 * Total Variation + (1-beta1-beta2)* Weakly Loss")  
-parser.add_argument("--nr_searches", type=int, default=1,
-                    help="Number of random searches to perform.")   
-parser.add_argument("folder", type=str, 
-                    help="Directory where images and models are to be stored.")
-parser.add_argument("--pretrained", default=False,
-                    help="True if one wants to load pre trained models in training phase 1, False otherwise.")
-parser.add_argument("--loss", type=str, default='weakly',
-                    help="Specifiy if loss is weakly/hybrid/unsupervised or not.")
-parser.add_argument("--opt", type=str, default='adadelta', 
-                    help="Optimizer to use. Either adadelta or sgd.")
-parser.add_argument("-lr", "--learning_rate", type=float, default=0.001,
-                    help="Learning rate to use with sgd.")
-parser.add_argument("--decay", type=float, default=0.0001,
-                    help="Learning rate decay to use with sgd.")
-parser.add_argument("-mom", "--momentum", type=float, default=0.9,
-                    help="Momentum to use with sgd.")
-parser.add_argument("-min_lr", "--min_learning_rate", type=float, default=1e-5,
-                    help="Minimum learning rate to use with sgd and with ReduceLearningRateonPlateau.")
-parser.add_argument("--patience", type=int, default=10,
-                    help="Patience (number of epochs for a model to be considered as converged) to use with sgd and with ReduceLearningRateonPlateau.")
-parser.add_argument("--factor", type=float, default=0.2, 
-                    help="Learning rate changing factor to use with sgd and with ReduceLearningRateonPlateau.")
-parser.add_argument("--exp_conv_num", type=int, default=3,
-                    help="Number of convolutional explainer stages.")
-parser.add_argument("--exp_conv_conseq", type=int, default=2,
-                    help="Number of convolutional layers in each explainer stage.")
-parser.add_argument("--exp_conv_filters", type=int, default=32,
-                    help="Number of filters for the initial convolutional explainer stage.")
-parser.add_argument("--exp_conv_filter_size", type=tuple, default=(3,3),
-                    help="Filter size for the initial explainer stage's filters.")
-parser.add_argument("--exp_conv_activation", type=str, default='relu',
-                    help="Activation function for the explainer's convolutional section.")
-parser.add_argument("--exp_pool_size", type=int, default=2,
-                    help="Explainer pooling layers' size.")
-parser.add_argument("--dec_conv_num", type=int, default=4,
-                    help="Number of transpose convolutional explainer stages.")   
-parser.add_argument("--dec_conv_conseq", type=int, default=2,
-                    help="Number of transpose convolutional layers in each explainer stage.")                    
-parser.add_argument("--dec_conv_filters", type=int, default=32,
-                    help="Number of filters for the initial transpose convolutional explainer stage.")
-parser.add_argument("--dec_conv_filter_size", type=tuple, default=(3,3),
-                    help="Filter size for the initial explainer transpose convolutional stage's filters.")
-parser.add_argument("--dec_conv_activation", type=str, default='relu',
-                    help="Activation function for the explainer's transpose convolutional section.")
-parser.add_argument("--dec_pool_size", type=int, default=2,
-                    help="Explainer pooling layers' size - transpose convolution.")
-parser.add_argument("--dec_dense_num", type=int, default=2,
-                    help="Number of dense layers in the explainer.")
-parser.add_argument("--dec_dense_width", type=int, default=128,
-                    help="Width of dense layers in the explainer.")
-parser.add_argument("--dec_dense_activation", type=str, default='sigmoid',
-                    help="Activation function for the explainer's dense layers.")
-parser.add_argument("--img_size", type=tuple, default=(224, 224), help="Input image size.")
-parser.add_argument("--dropout", type=float, default=0.3, help="Dropout rate (VGG classifier).")
-parser.add_argument("-clf", "--classifier", type=str, default='VGG', help="Classifier (VGG or ResNet50).")
-parser.add_argument("--cropped", default=True, help="Load NIH-NCI dataset with cropped images if True, otherwise False.")
-parser.add_argument("--random_labels", default=False, help="Randomize labels.")
-parser.add_argument("--augment", default=False, help="Perform data augmentation.")
+parser = argparse.ArgumentParser(description="Configurable parameters.")
+
+# Processing parameters
+parser.add_argument(
+    "--gpu", type=str, default="1", help="Which gpus to use in CUDA_VISIBLE_DEVICES."
+)
+parser.add_argument(
+    "--num_workers", type=int, default=4, help="Number of workers for dataloader."
+)
+
+# Directories and paths
+parser.add_argument(
+    "--dataset_path",
+    type=str,
+    default="/media/TOSHIBA6T/ICRTO",
+    help="Folder where dataset is located.",
+)
+parser.add_argument(
+    "--folder",
+    type=str,
+    default="/media/TOSHIBA6T/ICRTO/results",
+    help="Directory where images and models are to be stored.",
+)
+
+# Data parameters
+parser.add_argument(
+    "--dataset",
+    type=str,
+    default="imagenetHVZ",
+    choices=["synthetic", "NIH-NCI", "imagenetHVZ"],
+    help="Dataset to load.",
+)
+parser.add_argument(
+    "--nr_classes", type=int, default=2, help="Number of target classes."
+)
+parser.add_argument(
+    "--img_size", nargs="+", type=int, default=[224, 224], help="Input image size."
+)
+parser.add_argument(
+    "--aug_prob",
+    type=float,
+    default=0,
+    help="Probability of applying data augmentation to each image.",
+)
+
+# Training parameters
+parser.add_argument(
+    "--nr_epochs",
+    type=str,
+    default="10,10,50",
+    help="Number of epochs for each of the 3 training phases as an array, for example: 50,100,50.",
+)
+parser.add_argument(
+    "-bs", "--batch_size", type=int, default=32, help="Training batch size."
+)
+parser.add_argument(
+    "--pretrained",
+    default=False,
+    action="store_true",
+    help="True if one wants to load pre trained models in training phase 1, False otherwise.",
+)
+parser.add_argument(
+    "-clf",
+    "--classifier",
+    type=str,
+    default="resnet50",
+    choices=["vgg", "resnet50"],
+    help="Classifier.",
+)
+parser.add_argument(
+    "--init_bias",
+    type=float,
+    default=2.0,
+    help="Initial bias for the batch norm layer of the Explainer. For more details see the paper.",
+)
+
+# Loss parameters
+parser.add_argument(
+    "--loss",
+    type=str,
+    default="unsupervised",
+    choices=["hybrid", "unsupervised"],
+    help="Specifiy which loss to use. Either hybrid or unsupervised.",
+)
+parser.add_argument(
+    "--alpha",
+    type=str,
+    default="1.0,0.0,0.9",
+    help="Loss = alpha * Lclassif + (1-alpha) * Lexplic for each phase, for example: 1.0,0.0,0.9.",
+)
+parser.add_argument(
+    "--beta", type=float, help="Lexplic_unsup = beta * L1 + (1-beta) * Total Variation"
+)
+parser.add_argument(
+    "--gamma",
+    type=float,
+    help="Lexplic_hybrid = beta * L1 + (1-beta) * Total Variation + gamma* Weakly Loss",
+)
+parser.add_argument(
+    "--class_weights",
+    action="store_true",
+    default=False,
+    help="Use class weighting in loss function.",
+)
+
+# Learning parameters
+parser.add_argument(
+    "--opt",
+    type=str,
+    default="sgd",
+    choices=["sgd", "adadelta"],
+    help="Optimiser to use. Either adadelta or sgd.",
+)
+parser.add_argument(
+    "-lr",
+    "--learning_rate",
+    type=str,
+    default="1e-3,0,1e-4",
+    help="Learning rate for each training phase, for example: 1e-3,0,1e-4.",
+)
+parser.add_argument(
+    "--decay", type=float, default=0.0001, help="Learning rate decay to use with sgd."
+)
+parser.add_argument(
+    "-mom",
+    "--momentum",
+    type=float,
+    default=0.9,
+    help="Momentum to use with sgd optimiser.",
+)
+parser.add_argument(
+    "-min_lr",
+    "--min_learning_rate",
+    type=float,
+    default=1e-5,
+    help="Minimum learning rate to use with sgd and with ReduceLearningRateonPlateau.",
+)
+parser.add_argument(
+    "--patience",
+    type=int,
+    default=10,
+    help="Patience (number of epochs for a model to be considered as converged) to use with sgd and with ReduceLearningRateonPlateau.",
+)
+parser.add_argument(
+    "--factor",
+    type=float,
+    default=0.2,
+    help="Learning rate changing factor to use with sgd and with ReduceLearningRateonPlateau.",
+)
+
+# Early Stopping Parameters
+parser.add_argument(
+    "--early_patience",
+    type=str,
+    default="200,200,200",
+    help="Number of epochs (for each phase) to consider before Early Stopping, for example: 10,20,5.",
+)
+parser.add_argument(
+    "--early_delta",
+    type=int,
+    default=1e-4,
+    help="Minimum change in the monitored quantity to qualify as an improvement for Early Stopping.",
+)
 
 args = parser.parse_args()
-print(args)
 
-os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+# select defined gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 
-# confirm TensorFlow sees the GPU
-assert 'GPU' in str(device_lib.list_local_devices())
-
-# confirm Keras sees the GPU
-assert len(K.tensorflow_backend._get_available_gpus()) > 0
-
-
-nr_gpus = args.nr_gpus
-
-dtset = args.dataset
-loss = args.loss
-weakly = False
-if(loss == 'weakly' or loss == 'hybrid'):
-    weakly = True
-
-tr_df, val_df, test_df = utils.load_data(dtset, path=args.dataset_path, weakly=weakly, preprocessed=args.cropped, random_labels=args.random_labels)
-nr_classes = args.nr_classes
-
-eps = args.nr_epochs.split(',')
-nr_epochs = np.array([int(x) for x in eps])
-
-steps_per_epoch = int(np.ceil(len(tr_df)/args.batch_size))
-
-alfa = np.array([float(x) for x in args.alfas.split(',')])
-hyperparams = {'alfas': alfa}
-if(loss == 'unsup'):
-    if(args.betas is None):
-        print("Please define at least one value for beta.")
-        sys.exit(-1)
-    hyperparams['betas'] = np.array([float(x) for x in args.betas.split(',')])
-elif(loss == 'weakly'):
-    pass
-elif(loss == 'hybrid'):
-    if(args.betas1 is None):
-        print("Please define at least one value for beta1.")
-        sys.exit(-1)
-    if(args.betas2 is None):
-        print("Please define at least one value for beta2.")
-        sys.exit(-1)
-    hyperparams['betas1'] = np.array([float(x) for x in args.betas1.split(',')])
-    hyperparams['betas2'] = np.array([float(x) for x in args.betas2.split(',')])
-else:
-    print('Invalid loss function. Try again with <unsup>, <weakly> or <hybrid>.')
+# verify loss parameters
+if args.beta is None:
+    print("Please define a value for beta.")
     sys.exit(-1)
 
+masks = False
+if args.loss == "hybrid":
+    masks = True  # ensure that the dataloader returns object detection masks
+    if args.gamma is None:
+        print("Please define a value for gamma.")
+        sys.exit(-1)
+    loss_fn = hybrid_explanation_loss(beta=args.beta, gamma=args.gamma)
+elif args.loss == "unsupervised":
+    loss_fn = unsupervised_explanation_loss(beta=args.beta)
+
+# split epochs' string into an array of 3 integer values, one for each training phase
+eps = args.nr_epochs.split(",")
+nr_epochs = np.array([int(x) for x in eps])
+
+# split learning rates' string into an array of 3 integer values, one for each training phase
+lrs = args.learning_rate.split(",")
+lr = np.array([float(x) for x in lrs])
+
+# split alphas' string into an array of 3 integer values, one for each training phase
+alphas = args.alpha.split(",")
+alpha = np.array([float(x) for x in alphas])
+
+# split patience for early stopping string into an array of 3 integer values, one for each training phase
+early_patience = args.early_patience.split(",")
+early_patience = np.array([int(x) for x in early_patience])
+
+img_size = tuple(args.img_size)
+
+# create folder to store the results and models
 folder = args.folder
+timestamp, path = utils.create_folder(folder)
 
-opt_str = args.opt
-if(opt_str == 'adadelta'):
-    opt = utils.optimizer(opt_str, None, None, None)
+# save training config
+with open(os.path.join(path, timestamp + "_train_parameters_summary.txt"), "w") as f:
+    f.write(str(args))
+
+# instantiate model class
+model = ExplainerClassifierCNN(
+    num_classes=args.nr_classes,
+    img_size=img_size,
+    clf=args.classifier,
+    init_bias=args.init_bias,
+    pretrained=args.pretrained,
+)
+
+# save a summary of the model used
+model.save_architecture(timestamp, path)
+
+
+# define class weights for imbalanced data
+if args.class_weights:
+    class_weights = "balanced"
 else:
-    opt = utils.optimizer(opt_str, args.learning_rate, args.decay, args.momentum)
+    class_weights = None
 
-search = 0
-print('Starting random search')
+# load data and create training and validation data generators
+tr_df, val_df, _, weights, classes = load_data(
+    folder=args.dataset_path,
+    dataset=args.dataset,
+    masks=masks,
+    class_weights=class_weights,
+)
 
-for item in rn.sample(list(it.product(*hyperparams.values())), k=args.nr_searches):
-    search += 1
-    print("Search %d of %d" % (search, args.nr_searches))
+train_datagen = DataGenerator(
+    tr_df,
+    batch_size=args.batch_size,
+    img_size=img_size,
+    num_classes=args.nr_classes,
+    masks=masks,
+    aug_prob=args.aug_prob,
+    shuffle=True,
+)
+val_datagen = DataGenerator(
+    val_df,
+    batch_size=args.batch_size,
+    img_size=img_size,
+    num_classes=args.nr_classes,
+    masks=masks,
+    aug_prob=0,
+    shuffle=True,
+)
 
-    a = item[0]
-    print("alfa = %.2f" % a)
+# Start training (3 phases)
+for phase in range(3):
+    print("PHASE ", str(phase))
+    if nr_epochs[phase] == 0:
+        continue
 
-    if(loss == 'unsup'):
-        b = item[1]
-        loss_func = utils.unsupervised_explanation_loss(beta=b)
-        print("beta = %.2f" % b)
-        timestamp, path = utils.create_folder(folder, args.classifier, dtset, opt_str, args.learning_rate, args.decay, args.batch_size, args.nr_epochs, args.loss, a, b, None, None) 
-    elif(loss == 'weakly'):
-        loss_func = utils.weaklysupervised_explanation_loss
-        timestamp, path = utils.create_folder(folder,  args.classifier, dtset, opt_str, args.learning_rate, args.decay, args.batch_size, args.nr_epochs, args.loss, a, None, None, None) 
-    elif(loss == 'hybrid'):
-        b1 = item[1]
-        b2 = item[2]
-        print("beta1 = %.2f" % b1)
-        print("beta2 = %.2f" % b2)
-        if(b1 + b2 >= 1.0):
-            print('Ignored beta1 and beta2.')
-            continue
-        loss_func = utils.hybrid_explanation_loss(beta1=b1, beta2=b2)
-        timestamp, path = utils.create_folder(folder,  args.classifier, dtset, opt_str, args.learning_rate, args.decay, args.batch_size, args.nr_epochs, args.loss, a, None, b1, b2) 
+    if phase == 0:
+        # freeze explainer
+        utils.freeze(model.explainer)
+    elif phase == 1:
+        # unfreeze explainer and freeze classifier
+        utils.unfreeze(model.explainer)
+        utils.freeze(model.classifier)
+    elif phase == 2:
+        # unfreeze classifier
+        utils.unfreeze(model.classifier)
 
-   
+    if args.opt == "sgd":
+        opt = SGD(lr=lr[phase], decay=args.decay, momentum=args.momentum,)
+    elif args.opt == "adadelta":
+        opt = Adadelta()
 
-    model = ExplainerClassifierCNN(nr_gpus=nr_gpus, num_classes=nr_classes,
-                 dec_conv_num=args.dec_conv_num, dec_conv_conseq=args.dec_conv_conseq, 
-                 dec_conv_filters=args.dec_conv_filters,
-                 dec_conv_filter_size=args.dec_conv_filter_size, dec_conv_activation=args.dec_conv_activation, 
-                 dec_pool_size=args.dec_pool_size, dec_dense_num=args.dec_dense_num, dec_dense_width=args.dec_dense_width, 
-                 dec_dense_activation=args.dec_dense_activation, img_size=args.img_size,
-                 dropout=args.dropout, clf=args.classifier, loss=loss)
+    model.e2e_model.compile(
+        optimizer=opt,
+        loss_weights={
+            "classifier": float(alpha[phase]),
+            "explainer": 1.0 - float(alpha[phase]),
+        },
+        loss={"explainer": loss_fn, "classifier": "categorical_crossentropy"},
+        metrics={"classifier": ["accuracy"]},
+    )
 
+    model_filename = timestamp + "_phase" + str(phase) + "_model.h5"
+    model_path = os.path.join(path, model_filename)
 
-    if(weakly):
-        val_imgs, val_imgs_preprocessed, val_idxs, val_labels, val_masks = utils.get_images_and_labels(model.img_size, test_df, model.decmaker.preprocess_function, weakly)
-    else:
-        val_imgs, val_imgs_preprocessed, val_idxs, val_labels = utils.get_images_and_labels(model.img_size, test_df, model.decmaker.preprocess_function, weakly)
+    callbacks = utils.config_callbacks(
+        model,
+        args.factor,
+        args.patience,
+        args.min_learning_rate,
+        early_patience[phase],
+        args.early_delta,
+        model_path,
+    )
 
-    for phase in range(3):
+    history = model.e2e_model.fit(
+        train_datagen,
+        validation_data=val_datagen,
+        epochs=nr_epochs[phase],
+        callbacks=callbacks,
+        verbose=1,
+        use_multiprocessing=False,
+        # class_weight={"classifier": weights, "explainer": None}, --> waiting for tensorflow to fix the bug and make this possible
+    )
+    hist_df = utils.save_history(
+        history,
+        os.path.join(path, str(timestamp + "_phase" + str(phase) + "_history.csv")),
+    )
+    utils.plot_metric_train_val(
+        nr_epochs[phase],
+        hist_df,
+        "classifier_loss",
+        path,
+        os.path.join(path, timestamp + "_phase" + str(phase) + "_classifier_loss.png"),
+        "Classifier Loss",
+    )
+    utils.plot_metric_train_val(
+        nr_epochs[phase],
+        hist_df,
+        "explainer_loss",
+        path,
+        os.path.join(path, timestamp + "_phase" + str(phase) + "_explainer_loss.png"),
+        "Explainer Loss",
+    )
+    utils.plot_metric_train_val(
+        nr_epochs[phase],
+        hist_df,
+        "loss",
+        path,
+        os.path.join(path, timestamp + "_phase" + str(phase) + "_global_loss.png"),
+        "Global Loss",
+    )
+    utils.plot_metric_train_val(
+        nr_epochs[phase],
+        hist_df,
+        "classifier_accuracy",
+        path,
+        os.path.join(path, timestamp + "_phase" + str(phase) + "_classifier_acc.png"),
+        "Accuracy",
+    )
 
-        if(nr_epochs[phase] == 0): continue
-       
-        model.build_model(phase=phase, pretrained=args.pretrained)
-
-        if(phase > 0):
-            print('Trying to load weights from file: %s' % previous_model_path)
-            try:
-                model.e2e_model.load_weights(previous_model_path, by_name=False)
-                print("Loaded e2e weights from " + previous_model_path)
-            except Exception as e:
-                print("Error loading pre-trained e2e model.")
-                print(e)
-                sys.exit(-1)
-
-        if(phase == 0):
-            model.explainer.freeze()
-            print(model.explainer.model.layers[0].trainable)
-        elif(phase == 1):
-            model.decmaker.freeze()
-            print(model.decmaker.model.layers[0].trainable)
-
-
-        model.e2e_model_gpu.compile(optimizer=opt,
-                                    loss_weights={'decision-maker': a,
-                                                    'explainer': 1.0-a
-                                                },
-                                    loss={'explainer': loss_func,
-                                            'decision-maker': 'categorical_crossentropy'
-                                        },
-                                    metrics={'decision-maker': ['accuracy'],
-                                            'explainer': [utils.active_pixels]
-                                            })
-        model.e2e_model.summary()
-        model.save_architecture(phase, timestamp, path)
-        e2e_model_filename = timestamp + '_phase' + str(phase) + '_model.h5'
-        e2e_model_path = os.path.join(path, e2e_model_filename)
-        decmaker_model_filename = timestamp + '_phase' + str(phase) + '_decmaker_model.h5'
-        decmaker_model_path = os.path.join(path, decmaker_model_filename)
-        exp_model_filename = timestamp + '_phase' + str(phase) + '_exp_model.h5'
-        exp_model_path = os.path.join(path, exp_model_filename)
-        
-        callbacks = utils.config_callbacks(model, args.factor, args.patience, args.min_learning_rate, decmaker_model_path, exp_model_path, e2e_model_path)
-        model.history = callbacks[0]
-        model.fit(tr_df, val_df, nr_epochs[phase], steps_per_epoch, callbacks, path, augment=args.augment, loss=loss)
-        
-        utils.plot_metric_train_val(nr_epochs[phase], model.history, 'decision-maker_loss', path, os.path.join(path, timestamp + '_phase' + str(phase) + '_decmaker_loss.png'), 'Classifier Loss')
-        utils.plot_metric_train_val(nr_epochs[phase], model.history, 'explainer_loss', path, os.path.join(path, timestamp + '_phase' + str(phase) + '_explainer_loss.png'), 'Explainer Loss')
-        utils.plot_metric_train_val(nr_epochs[phase], model.history, 'loss', path, os.path.join(path, timestamp + '_phase' + str(phase) + '_global_loss.png'), 'Global Loss')
-        utils.plot_metric_train_val(nr_epochs[phase], model.history, 'decision-maker_acc', path, os.path.join(path, timestamp + '_phase' + str(phase) + '_decision-maker_acc.png'), 'Accuracy')
-
-        utils.save_history(model.history, path, str(timestamp + '_phase' + str(phase) + '_history.txt'))
-
-        previous_model_path = e2e_model_path
-
-    utils.save_model(model, path)
-    utils.class_predictions(model.e2e_model, steps_per_epoch, args.batch_size, args.img_size, 'test', test_df, val_imgs_preprocessed, val_idxs, val_labels, path, timestamp, phase)
-    if(weakly):
-        utils.compute_accuracy(model.e2e_model, model.num_classes, 'test', val_imgs_preprocessed, val_labels, path, timestamp, args.img_size, phase, masks=val_masks)
-    else:
-        utils.compute_accuracy(model.e2e_model, model.num_classes, 'test', val_imgs_preprocessed, val_labels, path, timestamp, args.img_size, phase)
-    utils.save_explanations(model.e2e_model, steps_per_epoch, args.batch_size, args.img_size, 'test', test_df, val_imgs, val_imgs_preprocessed, val_idxs, path, timestamp, phase)
-    
-    del model
-    print(gc.collect())
-
-print('Finished')
+    model.save_explanations(val_datagen, phase, path, classes=classes, cmap="viridis")

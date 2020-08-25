@@ -1,186 +1,161 @@
-from sklearn.base import BaseEstimator, ClassifierMixin
-from Explainer import Explainer
-from VGG import VGGClf
-from ResNet50Mod import ResNet50ModClf
-from keras.utils import multi_gpu_model, plot_model
-from keras import layers as KL
+from Explainer import explainer
+from VGG import vgg
+from ResNet50Mod import resnet50
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras import layers as KL
 import numpy as np
-np.random.seed(42)
-from keras.models import Model
-from keras import backend as K
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Model
 import os
 import utils
 import sys
+import matplotlib.pyplot as plt
 
-class ExplainerClassifierCNN(BaseEstimator, ClassifierMixin):
-    def __init__(self, exp_conv_num=3, exp_conv_conseq=2, exp_conv_filters=32,
-                 exp_conv_filter_size=(3, 3), exp_conv_activation='relu',
-                 exp_pool_size=2,
-                 dec_conv_num=4, dec_conv_conseq=2, dec_conv_filters=32,
-                 dec_conv_filter_size=(3, 3), dec_conv_activation='relu', 
-                 dec_pool_size=2,
-                 dec_dense_num=2, dec_dense_width=128, dec_dense_activation='sigmoid',
-                 img_size=(224, 224),
-                 dropout=0.3, batch_size=32,
-                 num_classes=2, nr_gpus=1,
-                 clf='VGG', loss='weakly',
-                ):
 
-        self.exp_conv_num = exp_conv_num
-        self.exp_conv_conseq = exp_conv_conseq
-        self.exp_conv_filters = exp_conv_filters
-        self.exp_conv_filter_size = exp_conv_filter_size
-        self.exp_conv_activation = exp_conv_activation
-        self.exp_pool_size = exp_pool_size
+class ExplainerClassifierCNN:
+    def __init__(
+        self,
+        img_size=(224, 224),
+        num_classes=2,
+        clf="resnet50",
+        init_bias=3.0,
+        pretrained=False,
+    ):
+        super(ExplainerClassifierCNN, self).__init__()
 
-        self.dec_conv_num = dec_conv_num
-        self.dec_conv_conseq = dec_conv_conseq
-        self.dec_conv_filters = dec_conv_filters
-        self.dec_conv_filter_size = dec_conv_filter_size
-        self.dec_conv_activation = dec_conv_activation
-        self.dec_pool_size = dec_pool_size
-        
-        self.dec_dense_num = dec_dense_num
-        self.dec_dense_width = dec_dense_width
-        self.dec_dense_activation = dec_dense_activation
-        
-        self.dropout = dropout
-        self.batch_size = batch_size
         self.img_size = img_size
-        self.num_classes = num_classes  
-        self.nr_gpus = nr_gpus
+        self.num_classes = num_classes
 
         self.clf = clf
-        self.loss = loss
-        if(self.clf == 'ResNet50Mod'):
-            self.decmaker = ResNet50ModClf(self.img_size, self.num_classes)
+        self.init_bias = init_bias
+        self.pretrained = pretrained
+
+        # classifier
+        if self.clf == "resnet50":
+            self.classifier = resnet50(
+                img_size=self.img_size,
+                num_classes=self.num_classes,
+                pretrained=self.pretrained,
+            )
         else:
-            self.decmaker = VGGClf(dec_conv_num=self.dec_conv_num, dec_conv_conseq=self.dec_conv_conseq, 
-                 dec_conv_filters=self.dec_conv_filters,
-                 dec_conv_filter_size=self.dec_conv_filter_size, dec_conv_activation=self.dec_conv_activation, 
-                 dec_pool_size=self.dec_pool_size, dec_dense_num=self.dec_dense_num, dec_dense_width=self.dec_dense_width, 
-                 dec_dense_activation=self.dec_dense_activation, img_size=self.img_size,
-                 dropout=self.dropout, num_classes=self.num_classes)
+            self.classifier = vgg(img_size=self.img_size, num_classes=self.num_classes)
 
+        # explainer
+        self.explainer = explainer(img_size=self.img_size, init_bias=self.init_bias)
 
-    def build_model(self, phase, pretrained):
-        
-        self.explainer = Explainer()
-        self.explainer.build_explainer()
-          
-        if(isinstance(self.decmaker, ResNet50ModClf)):
-            self.decmaker.build_classifier(phase, pretrained)
-        else:
-            self.decmaker.build_classifier()
+        # build the model
+        self.build_model()
 
-        input_image = KL.Input(tuple(list(self.img_size) + [3]), name='input_img')
-        fixed_explanation_input =  KL.Input(tensor=K.constant(np.ones(tuple([self.batch_size] + list(self.img_size) + [1]))), name='fixed_explanation_input')
+    def build_model(self):
+        input_image = KL.Input(tuple(list(self.img_size) + [3]), name="input_img")
+        explanation = self.explainer(input_image)
+        decision = self.classifier([explanation, input_image])
+        self.e2e_model = Model(inputs=[input_image], outputs=[explanation, decision])
 
-        explanation = self.explainer.model(input_image)
-        
-        if(phase < 2):
-            decision = self.decmaker.model([fixed_explanation_input, input_image])
-            self.e2e_model = Model(inputs=[input_image, fixed_explanation_input], outputs=[explanation, decision])
-        else: 
-            decision = self.decmaker.model([explanation, input_image])
-            self.e2e_model = Model(inputs=[input_image], outputs=[explanation, decision])
-        
-        if(self.nr_gpus > 1):
-            self.e2e_model_gpu = multi_gpu_model(self.e2e_model, self.nr_gpus)
-        else:
-            self.e2e_model_gpu = self.e2e_model
+    def save_architecture(self, timestamp, path):
+        self.exp_model_filename = timestamp + "_model_exp.png"
+        self.dec_model_filename = timestamp + "_model_clf.png"
+        self.e2e_model_filename = timestamp + "_model_e2e.png"
 
-        return self
-        
-    def generate_generator(self, dims, gen):
-        while True:
-            imgs, labels = next(gen)
-            yield imgs, {'decision-maker': labels, 'explainer': np.zeros(dims)}
-
-    def fit(self, tr_df, val_df, nr_epochs, steps_per_epoch, callbacks, path, augment=False, loss='unsup'):
-        if(nr_epochs > 0):
-            if(augment):
-                save_path = os.path.join(path, 'augmented')
-                if(not os.path.exists(save_path)):
-                    os.makedirs(save_path)
-                print(save_path)
-                datagen_args = dict(
-                            rotation_range=20,
-                            width_shift_range=0.2,
-                            height_shift_range=0.2,
-                            horizontal_flip=True,
-                            vertical_flip=True,
-                            preprocessing_function=self.decmaker.preprocess_function,
-                            rescale=1./255)
-                            
-                image_datagen = ImageDataGenerator(**datagen_args)
-
-                train_generator = image_datagen.flow_from_dataframe(
-                        dataframe=tr_df,
-                        x_col='imageID',
-                        y_col='GT_real',
-                        target_size=self.img_size,
-                        batch_size=self.batch_size,
-                        class_mode='categorical',
-                        shuffle=True,
-                        seed=42,
-                        save_prefix='aug',
-                        save_to_dir=save_path)
-                
-                
-                
-                if((loss == 'weakly') or (loss == 'hybrid')):
-                    mask_datagen = ImageDataGenerator(**datagen_args)
-                    mask_generator = mask_datagen.flow_from_dataframe(
-                        dataframe=tr_df,
-                        x_col='maskID',
-                        class_mode=None,
-                        shuffle=True,
-                        seed=42,
-                        target_size=self.img_size,
-                        batch_size=self.batch_size,
-                        save_prefix='aug_mask',
-                        save_to_dir=save_path)
-                    tr_gen = zip(image_generator, mask_generator)
-                else:                    
-                    t = tuple([self.batch_size] + list(self.img_size) + [3])
-                    tr_gen = self.generate_generator(t, train_generator)
-                    #tr_gen = zip(train_generator, z)
-                    #print(next(tr_gen))
-                    #sys.exit(0)
-            else:
-                tr_gen = utils.image_generator(tr_df, batch_size=self.batch_size, img_size=self.img_size,
-                                        num_classes=self.num_classes, preprocess_function=self.decmaker.preprocess_function)
-                #print(next(tr_gen))
-                #sys.exit(0)
-            
-            val_gen = utils.image_generator(val_df, batch_size=self.batch_size, img_size=self.img_size,
-                                        num_classes=self.num_classes, preprocess_function=self.decmaker.preprocess_function)
-
-            self.e2e_model_gpu.fit_generator(tr_gen, validation_data=val_gen,
-                                    epochs=nr_epochs,
-                                    steps_per_epoch=steps_per_epoch,
-                                    validation_steps=steps_per_epoch,
-                                    callbacks=callbacks,
-                                    verbose=True, use_multiprocessing=False)
-        return self
-    
-    def save_architecture(self, phase, timestamp, path, option=None, layer=None):
-        if((option is not None) and (layer is not None)):
-            self.exp_model_filename = timestamp + '_phase' + str(phase) + '_' + option + '_layer_' + str(layer) + '_model_exp.png'
-            self.dec_model_filename = timestamp + '_phase' + str(phase) + '_' + option + '_layer_' + str(layer) + '_model_dec.png'
-            self.e2e_model_filename = timestamp + '_phase' + str(phase) + '_' + option + '_layer_' + str(layer) + '_model_e2e.png'
-        else:
-            self.exp_model_filename = timestamp + '_phase' + str(phase) + '_model_exp.png'
-            self.dec_model_filename = timestamp + '_phase' + str(phase) + '_model_dec.png'
-            self.e2e_model_filename = timestamp + '_phase' + str(phase) + '_model_e2e.png'
-            
-        plot_model(self.explainer.model, to_file=os.path.join(path, self.exp_model_filename))
+        plot_model(self.explainer, to_file=os.path.join(path, self.exp_model_filename))
         print("Model printed to " + os.path.join(path, self.exp_model_filename))
 
-        plot_model(self.decmaker.model, to_file=os.path.join(path, self.dec_model_filename))
+        plot_model(self.classifier, to_file=os.path.join(path, self.dec_model_filename))
         print("Model printed to " + os.path.join(path, self.dec_model_filename))
 
         plot_model(self.e2e_model, to_file=os.path.join(path, self.e2e_model_filename))
         print("Model printed to " + os.path.join(path, self.e2e_model_filename))
+
+    def save_explanations(
+        self, datagen, phase, path, test=False, classes=None, cmap=None,
+    ):
+        """ Generates and saves explanations for a set of images given by dataloader
+
+            Arguments:
+                datagen {tf.keras.utils.Sequence} -- data generator
+                phase {int} -- training phase
+                path {str} -- directory to store the generated explanations
+
+            Keyword Arguments:
+                test {bool} -- whether we are running inference on the test set or not (default: {False})
+                classes {list} -- list of class names (default: {None})
+                cmap {str} -- matplotlib colourmap for the produced explanations (default: {None})
+            """
+        # defines colourmap and pixel value range
+        if cmap == "None":
+            cmap = "seismic"
+            mode = "captum"  # for better comparison with captum methods
+            vmin, vmax = -1, 1
+        else:
+            vmin, vmax = 0, 1
+            mode = "default"
+
+        print("\nSAVING EXPLANATIONS")
+        timestamp = path.split("/")[-1]
+
+        for batch_imgs, input_dict in datagen:
+            batch_labels = datagen.batch_labels
+            batch_names = datagen.batch_names
+
+            batch_expls, batch_probs = self.e2e_model.predict(
+                (batch_imgs, input_dict), verbose=0
+            )
+
+            for idx, img in enumerate(batch_imgs):
+                img = batch_imgs[idx]
+                expl = batch_expls[idx]
+
+                string = "Label: " + classes[batch_labels[idx]] + "\n"
+                for i, c in enumerate(classes):
+                    string += c + " " + str(round(batch_probs[idx][i], 6,)) + "\n"
+
+                # saves figure comparing the original image with the generated explanation side-by-side
+                plt.figure(1, figsize=(12, 5))
+                plt.subplot(121)
+                ax = plt.gca()
+                ax.relim()
+                ax.autoscale()
+                ax.axes.get_yaxis().set_visible(False)
+                ax.axes.get_xaxis().set_visible(False)
+                plt.title("Original Image", fontsize=14)
+                plt.imshow(img)
+
+                plt.subplot(122)
+                ax = plt.gca()
+                ax.axes.get_yaxis().set_visible(False)
+                ax.axes.get_xaxis().set_visible(False)
+                plt.title("Explanation", fontsize=14)
+                plt.imshow(expl, vmin=vmin, vmax=vmax, cmap=cmap)
+
+                plt.text(
+                    0.91, 0.5, string, fontsize=12, transform=plt.gcf().transFigure
+                )
+                if test:
+                    plt.savefig(
+                        os.path.join(
+                            path,
+                            "{}_phase{}_ex_img_test_{}_{}_{}".format(
+                                timestamp,
+                                str(phase),
+                                mode,
+                                cmap,
+                                batch_names[idx].split("/")[-1],
+                            ),
+                        ),
+                        bbox_inches="tight",
+                        transparent=True,
+                        pad_inches=0.1,
+                    )
+                else:
+                    plt.savefig(
+                        os.path.join(
+                            path,
+                            "{}_phase{}_ex_img_{}".format(
+                                timestamp, str(phase), batch_names[idx].split("/")[-1],
+                            ),
+                        ),
+                        bbox_inches="tight",
+                        transparent=True,
+                        pad_inches=0.1,
+                    )
+                plt.close()
+        print()
