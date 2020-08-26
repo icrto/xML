@@ -1,7 +1,7 @@
 ## Description
 
 <p align="justify">
-          Synthetic Dataset composed by images containing polygons. Each polygon is defined by its **p** and **q** factors, where p is the number of vertices and q represents how these vertices are connected, for example, if q equals 3 then the 1st vertex connects to the 4th and so on. If p equals -1 then the polygon is a circle and the value of q is irrelevant.
+          Synthetic Dataset composed by images containing polygons. Each polygon is defined by its <b>p</b> and <b>q</b> factors, where p is the number of vertices and q represents how these vertices are connected, for example, if q equals 3 then the 1st vertex connects to the 4th and so on. If p equals -1 then the polygon is a circle and the value of q is irrelevant.
 </p>
 
 <p align="justify">
