@@ -16,25 +16,33 @@ For each generated image, annotations are created in Pascal VOC format, containi
  * Where are polygons X located in the image?
           
 ## Configurable Parameters
-  * folder='train': directory where dataset is to be stored/imported from
-  * config_file=None: configuration file where parameters reside if not None. If None, parameters are passed as constructor args.
-  * nr_images=100: number of generated images
-  * polygon=[-1, None]: target polygon used to generate annotations given by its parameters p and q (if p equals -1, 
-            corresponding to a circle, then q is irrelevant)
-  * background_colour=255: background image colour
-  * img_height=224: image height
-  * img_width=224: image width
-  * nr_channels=3: nr of colour channels
-  * nr_shapes=20: number os polygons per generated image
-  * nr_tries=100: number of tries before algorithm gives up trying to fit polygon inside image
-  * rad_min=224/32: minimum possible radius for polygon outer circumference 
-  * rad_max=224/16: maximum possible radius for polygon outer circumference 
-  * overlap=False: overlap between polygons of the same image if True, no overlap between every two polygons if False
-  * occlusion=False: occlusion of polygons on image borders if True, no occlusion if False
-  * rotation=True: random rotation of polygons if True, no rotation if False
-  * noise=False: add Gaussian noise to image if True
-  * min_nr_vertices=3: minimum number of vertices
-  * max_nr_vertices=13: maximum number of vertices
+* config_file {str} -- configuration file where parameters reside if not None. If None, parameters are passed as constructor args. (default: {None})
+* folder {str} -- folder='train': directory where dataset is to be stored/imported from (default: {"train"})
+* nr_images {int} -- number of images to generate (default: {100})
+* nr_targets {int} -- number of images to generate with the target polygon present. If -1 then this number is randomly chosen. (default: {-1})
+* polygon {list} -- target polygon used to generate annotations given by its parameters p and q (if p equals -1, corresponding to a circle, then q is irrelevant) (default: {[-1, None]})
+* outside_polygon {bool} -- polygon to place around target polygon (default: {False})
+* background_colour {int} -- background image colour (default: {255})
+* img_height {int} -- image height (default: {224})
+* img_width {int} -- image width (default: {224})
+* nr_channels {int} -- number of colour channels (default: {3})
+* nr_shapes {int} -- number of polygons per generated image (default: {20})
+* nr_tries {int} -- number of tries before the algorithm gives up trying to fit polygon inside image (default: {100})
+* rad_min {[type]} -- minimum possible radius for polygon outer circumference (default: {224/32})
+* rad_max {[type]} -- maximum possible radius for polygon outer circumference (default: {224/16})
+* overlap {bool} -- overlap between polygons of the same image if True, no overlap between every two polygons if False (default: {False})
+* occlusion {bool} -- allows occlusion of polygons on image borders if True, no occlusion if False (default: {False})
+* rotation {bool} -- defines random rotation of polygons if True, no rotation if False (default: {True})
+* noise {bool} -- add Gaussian noise to image if True (default: {False})
+* min_nr_vertices {int} -- minimum number of vertices (default: {3})
+* max_nr_vertices {int} -- maximum number of vertices (default: {13})
+* min_nr_shapes {int} -- minimum number of polygons per image (default: {1})
+* max_nr_shapes {int} -- maximum number of polygons per image (default: {20})
+* simplified {bool} -- simplified version of the dataset (only triangles and circles) (default: {False})
+* no_circles {bool} -- do not draw circles (if simplified mode is set, then this parameter will be ignored) (default: {False})
+* poly_colour {bool} -- colour for the target polygon (default: {False})
+* start_index {int} -- start index for image naming (useful when one wants to add images to existing dataset) (default: {0})
+
   
  <p align="justify">
   If a json config file is given, these parameters are loaded from the file. If not, then parameters are given through arguments of the class constructor.
