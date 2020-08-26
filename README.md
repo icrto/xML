@@ -59,7 +59,7 @@ Some preliminary work was published in:
 
 [***Credits***](https://github.com/icrto/xML#Credits)
 
-[***Contact Info***](https://github.com/icrto/xML#Contact Info)
+[***Contact Info***](https://github.com/icrto/xML#contact-info)
 
 
 ## Architecture
