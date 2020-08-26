@@ -80,6 +80,9 @@ def strong_aug(p=0.5):
 
 
 class DataGenerator(tf.keras.utils.Sequence):
+    """DataGenerator Class
+    """
+
     def __init__(
         self,
         df,
@@ -91,6 +94,20 @@ class DataGenerator(tf.keras.utils.Sequence):
         aug_prob=0,
         shuffle=True,
     ):
+        """__init__ initial setup
+
+        Arguments:
+            df {pandas dataframe} -- dataframe from which to load the data
+
+        Keyword Arguments:
+            batch_size {int} -- batch size (default: {32})
+            img_size {tuple} -- image dimensions (default: {(224, 224)})
+            num_classes {int} -- number of classes (default: {2})
+            preprocess {function} --  preprocessing function to apply to each image (default: {utils.norm})
+            masks {bool} -- whether or not to load the binary masks for the hybrid explanation loss (default: {False})
+            aug_prob {int} -- probability of applying data augmentation (default: {0})
+            shuffle {bool} -- whether or not to shuffle the data (default: {True})
+        """
         super(DataGenerator, self).__init__()
         self.df = df
         self.batch_size = batch_size
@@ -106,13 +123,26 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.on_epoch_end()
 
     def __len__(self):
-        "Denotes the number of batches per epoch"
+        """__len__ computes the length of one epoch (aka number of steps per epoch)
+
+        Returns:
+            int -- number of steps per epoch
+        """
         return int(np.ceil(len(self.df) / self.batch_size))
 
     def __getitem__(self, index):
+        """__getitem__ generates a batch of data
+
+        Arguments:
+            index {int} -- batch index
+
+        Returns:
+            (numpy array, dictionary) -- returns a batch of images and their corresponding classification labels and explanation binary masks
+        """
         self.batch_labels = []
         self.batch_names = []
 
+        # get the batch's images ids
         batch_index = self.idxs[index * self.batch_size : (index + 1) * self.batch_size]
 
         img_names = self.df.iloc[batch_index]["imageID"].values
@@ -124,6 +154,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         ]
 
         masks = np.zeros_like(imgs)
+        # load masks (for hybrid loss only)
         if self.masks:
             mask_names = self.df.iloc[batch_index]["maskID"].values
             masks = [
@@ -161,33 +192,38 @@ class DataGenerator(tf.keras.utils.Sequence):
         labels = list(map(int, labels))
         y = tf.keras.utils.to_categorical(labels, num_classes=self.num_classes)
 
+        # to be used in save_explanations
         self.batch_labels.extend(labels)
         self.batch_names.extend([img_name.split("/")[-1] for img_name in img_names])
+
         return (
             imgs,
             {"classifier": y, "explainer": masks},
         )
 
     def on_epoch_end(self):
+        """on_epoch_end shuffle instances at the end of each epoch
+        """
         self.idxs = np.arange(len(self.df))
         if self.shuffle == True:
             np.random.shuffle(self.idxs)
 
 
 def load_synthetic_dataset(folder, masks=False, class_weights=None):
-    """ Loads synthetic dataset
+    """load_synthetic_dataset loads synthetic dataset
 
     Arguments:
         folder {str} -- directory where dataset is stored
 
     Keyword Arguments:
-        dataset {str} -- selects which synthetic dataset to load (default: {'simplified_no_colour'})
-        masks {bool} -- whether to load object detection masks (only need for hybrid loss) (default: {False})
+        masks {bool} -- whether to load object detection masks (only needed for hybrid loss) (default: {False})
         class_weights {str} -- whether to use class weights (default: {None})
 
     Returns:
         [misc] -- training, validation and testing dataframes, as well as class weights and class names
+
     """
+
     # encode class names
     classes = ["neg", "pos"]
 
@@ -226,7 +262,7 @@ def load_synthetic_dataset(folder, masks=False, class_weights=None):
 
 
 def load_NIH_NCI(folder, masks=False, class_weights=None):
-    """ Loads NIH-NCI cervical cancer dataset
+    """load_NIH_NCI loads NIH-NCI cervical cancer dataset
 
     Arguments:
         folder {str} -- directory where dataset is stored
@@ -238,6 +274,7 @@ def load_NIH_NCI(folder, masks=False, class_weights=None):
     Returns:
         [misc] -- training, validation and testing dataframes, as well as class weights and class names
     """
+
     # encode class names
     classes = ["healthy", "cancer"]
     img_path = folder
@@ -311,7 +348,7 @@ def load_NIH_NCI(folder, masks=False, class_weights=None):
 
 
 def load_imagenetHVZ(folder, masks=False, class_weights=None):
-    """ Loads imagenetHVZ dataset
+    """load_imagenetHVZ loads imagenetHVZ dataset
 
     Arguments:
         folder {str} -- directory where dataset is stored
@@ -323,6 +360,7 @@ def load_imagenetHVZ(folder, masks=False, class_weights=None):
     Returns:
         [misc] -- training, validation and testing dataframes, as well as class weights and class names
     """
+
     # encode class names
     classes = ["horse", "zebra"]
     le = LabelEncoder()
@@ -384,7 +422,7 @@ def load_imagenetHVZ(folder, masks=False, class_weights=None):
 
 
 def load_data(folder, dataset="imagenetHVZ", masks=False, class_weights=None):
-    """ Triage function to select corresponding loading function according to chosen dataset
+    """load_data triage function to select corresponding loading function according to chosen dataset
 
     Arguments:
         folder {str} -- directory where dataset is stored
@@ -397,6 +435,7 @@ def load_data(folder, dataset="imagenetHVZ", masks=False, class_weights=None):
     Returns:
         [misc] -- training, validation and testing dataframes, as well as class weights and class names
     """
+
     if dataset == "synthetic":
         return load_synthetic_dataset(
             folder=folder, masks=masks, class_weights=class_weights

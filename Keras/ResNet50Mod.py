@@ -13,12 +13,9 @@ Adapted from code contributed by BigMoyan.
 
 import warnings
 
-from tensorflow.keras.applications import imagenet_utils
-from tensorflow.keras.applications.imagenet_utils import decode_predictions
 from tensorflow.python.keras.applications.imagenet_utils import obtain_input_shape
 from tensorflow.keras import layers as KL
 from tensorflow.keras import models as modls
-from tensorflow.keras import Model
 from tensorflow.keras import backend as K
 from tensorflow.keras import utils as ut
 
@@ -237,11 +234,11 @@ def ResNet50Mod(
     else:
         bn_axis = 1
 
-    input_explanation_layer = KL.Input(
+    input_explanation_layer = layers.Input(
         tuple(list(input_shape[:2]) + [1]), name="decision-explanation-input"
     )
 
-    input_image_layer = KL.Input(
+    input_image_layer = layers.Input(
         shape=tuple(list(input_shape[:2]) + [3]), name="decision-image-input"
     )
     last_expl = input_explanation_layer
@@ -259,55 +256,100 @@ def ResNet50Mod(
     x = layers.Activation("relu")(x)
     x = layers.ZeroPadding2D(padding=(1, 1), name="pool1_pad")(x)
     x = layers.MaxPool2D((3, 3), strides=(2, 2))(x)
-    last_expl = KL.AveragePooling2D(
+    last_expl = layers.AveragePooling2D(
         pool_size=(4, 4), name="classifier-explanation-pool%d" % 1
-    )(last_expl)
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 64), x])
+    )(
+        last_expl
+    )  # explanations are downsampled using average pooling --> see paper for details
 
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 64), x]
+    )  # connection between explainer and classifier
     x = conv_block(x, 3, [64, 64, 256], stage=2, block="a", strides=(1, 1))
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 256), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 256), x]
+    )  # connection between explainer and classifier
     x = identity_block(x, 3, [64, 64, 256], stage=2, block="b")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 256), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 256), x]
+    )  # connection between explainer and classifier
     x = identity_block(x, 3, [64, 64, 256], stage=2, block="c")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 256), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 256), x]
+    )  # connection between explainer and classifier
 
-    last_expl = KL.AveragePooling2D(
+    last_expl = layers.AveragePooling2D(
         pool_size=(2, 2), name="classifier-explanation-pool%d" % 3
-    )(last_expl)
+    )(
+        last_expl
+    )  # explanations are downsampled using average pooling --> see paper for details
+
     x = conv_block(x, 3, [128, 128, 512], stage=3, block="a")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 512), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 512), x]
+    )  # connection between explainer and classifier
     x = identity_block(x, 3, [128, 128, 512], stage=3, block="b")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 512), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 512), x]
+    )  # connection between explainer and classifier
     x = identity_block(x, 3, [128, 128, 512], stage=3, block="c")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 512), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 512), x]
+    )  # connection between explainer and classifier
     x = identity_block(x, 3, [128, 128, 512], stage=3, block="d")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 512), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 512), x]
+    )  # connection between explainer and classifier
 
-    last_expl = KL.AveragePooling2D(
+    last_expl = layers.AveragePooling2D(
         pool_size=(2, 2), name="classifier-explanation-pool%d" % 4
-    )(last_expl)
-    x = conv_block(x, 3, [256, 256, 1024], stage=4, block="a")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 1024), x])
-    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="b")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 1024), x])
-    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="c")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 1024), x])
-    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="d")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 1024), x])
-    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="e")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 1024), x])
-    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="f")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 1024), x])
+    )(
+        last_expl
+    )  # explanations are downsampled using average pooling --> see paper for details
 
-    last_expl = KL.AveragePooling2D(
+    x = conv_block(x, 3, [256, 256, 1024], stage=4, block="a")
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 1024), x]
+    )  # connection between explainer and classifier
+    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="b")
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 1024), x]
+    )  # connection between explainer and classifier
+    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="c")
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 1024), x]
+    )  # connection between explainer and classifier
+    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="d")
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 1024), x]
+    )  # connection between explainer and classifier
+    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="e")
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 1024), x]
+    )  # connection between explainer and classifier
+    x = identity_block(x, 3, [256, 256, 1024], stage=4, block="f")
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 1024), x]
+    )  # connection between explainer and classifier
+
+    last_expl = layers.AveragePooling2D(
         pool_size=(2, 2), name="classifier-explanation-pool%d" % 5
-    )(last_expl)
+    )(
+        last_expl
+    )  # explanations are downsampled using average pooling --> see paper for details
+
     x = conv_block(x, 3, [512, 512, 2048], stage=5, block="a")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 2048), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 2048), x]
+    )  # connection between explainer and classifier
     x = identity_block(x, 3, [512, 512, 2048], stage=5, block="b")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 2048), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 2048), x]
+    )  # connection between explainer and classifier
     x = identity_block(x, 3, [512, 512, 2048], stage=5, block="c")
-    x = KL.Multiply()([KL.Concatenate()([last_expl] * 2048), x])
+    x = layers.Multiply()(
+        [layers.Concatenate()([last_expl] * 2048), x]
+    )  # connection between explainer and classifier
 
     if include_top:
         x = layers.GlobalAveragePooling2D(name="avg_pool")(x)
@@ -323,7 +365,7 @@ def ResNet50Mod(
                 "has been changed since Keras 2.2.0."
             )
 
-    x = KL.Dense(classes, activation="softmax")(x)
+    x = layers.Dense(classes, activation="softmax")(x)
 
     # Create model.
     model = models.Model(
@@ -358,6 +400,16 @@ def ResNet50Mod(
 
 
 def resnet50(img_size=(224, 224), num_classes=2, pretrained=True):
+    """resnet50 resnet50 main function
+
+    Keyword Arguments:
+        img_size {tuple} -- image dimensions (default: {(224, 224)})
+        num_classes {int} -- number of classes (default: {2})
+        pretrained {bool} -- whether or not to load imagenet pre-trained weights (default: {True})
+
+    Returns:
+        ResNet50Mod -- model
+    """
     input_shape = img_size + (3,)
     if pretrained == True:
         weights = "imagenet"

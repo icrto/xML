@@ -16,6 +16,25 @@ def vgg(
     dropout=0.3,
     num_classes=2,
 ):
+    """vgg classifier architecture constructor
+
+    Keyword Arguments:
+        dec_conv_num {int} -- number of convolutional stages (default: {4})
+        dec_conv_conseq {int} -- number of consecutive convolutional layers (default: {2})
+        dec_conv_filters {int} -- number of initial filters (default: {32})
+        dec_conv_filter_size {tuple} -- kernel size for convolutional layers (default: {(3, 3)})
+        dec_conv_activation {str} -- activation function for convolutional layers (default: {"relu"})
+        dec_pool_size {int} -- pooling factor (default: {2})
+        dec_dense_num {int} -- number of dense layers (default: {2})
+        dec_dense_width {int} -- width of dense layers (default: {128})
+        dec_dense_activation {str} -- activation function for dense layers (default: {"sigmoid"})
+        img_size {tuple} -- image dimensions (default: {(224, 224)})
+        dropout {float} -- dropout rate for dense/fully connected layers (default: {0.3})
+        num_classes {int} -- number of classes (default: {2})
+
+    Returns:
+        tf.keras.Model -- classifier model
+    """
 
     input_explanation_layer = KL.Input(
         tuple(list(img_size) + [1]), name="classifier-explanation-input"

@@ -5,11 +5,9 @@ import pandas as pd
 import datetime
 from tensorflow.keras.callbacks import (
     History,
-    LearningRateScheduler,
     ReduceLROnPlateau,
     EarlyStopping,
     ModelCheckpoint,
-    Callback,
 )
 from tensorflow.keras import backend as K
 from sklearn.metrics import (
@@ -36,7 +34,7 @@ plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
 def norm(img):
-    """ Scales image into [0, 1]
+    """ Scales image pixel values into the [0, 1] range
 
     Arguments:
         img {tensor} -- input image
@@ -48,19 +46,23 @@ def norm(img):
 
 
 def freeze(model):
+    """freeze freezes model layers
+
+    Arguments:
+        model {tf.keras.Model} -- model
+    """
     for layer in model.layers:
         layer.trainable = False
 
 
 def unfreeze(model):
+    """unfreeze unfreezes model layers
+
+    Arguments:
+        model {tf.keras.Model} -- model
+    """
     for layer in model.layers:
         layer.trainable = True
-
-
-class LRCallback(Callback):
-    def on_epoch_end(self, epoch, logs=None):
-        lr = float(K.get_value(self.model.optimizer.lr))
-        print(lr)
 
 
 def create_folder(folder):
@@ -87,9 +89,22 @@ def create_folder(folder):
 def config_callbacks(
     model, factor, lr_patience, min_lr, early_patience, early_delta, save_path,
 ):
+    """config_callbacks builds callback list for model.fit()
+
+    Arguments:
+        model {tf.keras.Model} -- model
+        factor {float} -- factor by which to decrease the learning rate (ReduceLROnPlateau)
+        lr_patience {int} -- number of epochs with no improvement after which learning rate will be reduced (ReduceLROnPlateau)
+        min_lr {[type]} -- lower bound on the learning rate (ReduceLROnPlateau)
+        early_patience {int} -- number of epochs with no improvement after which training will be stopped (early stopping)
+        early_delta {int} -- minimum change in the monitored quantity to qualify as an improvement (early stopping)
+        save_path {str} -- filename for saved model (checkpoint)
+
+    Returns:
+        list -- list of defined callbacks
+    """
     callbacks = []
     history = History()
-    lrCallback = LRCallback()
     earlystopping = EarlyStopping(
         monitor="val_loss",
         min_delta=early_delta,
@@ -107,7 +122,8 @@ def config_callbacks(
         save_freq="epoch",
     )
 
-    callbacks.extend((history, lrCallback, earlystopping, checkpointer))
+    callbacks.extend((history, earlystopping, checkpointer))
+
     if model.clf == "resnet50":
         reduce_lr = ReduceLROnPlateau(
             monitor="val_loss",
@@ -121,13 +137,22 @@ def config_callbacks(
 
 
 def save_history(history, filename):
+    """save_history saves history file as csv
+
+    Arguments:
+        history {history dict} -- history dictionary
+        filename {str} -- path to file where to store the produced csv
+
+    Returns:
+        pandas dataframe -- history dictionary converted into a pandas dataframe
+    """
     hist_df = pd.DataFrame.from_dict(history.history, orient="columns")
     hist_df.to_csv(filename)
     return hist_df
 
 
 def plot_metric_train_val(nr_epochs, hist, metric, path, filename, plot_title):
-    """ Plots (saves) training and validation evolution of specified metric
+    """plot_metric_train_val plots (saves) training and validation evolution of specified metric
 
     Arguments:
         nr_epochs {int} -- total number of epochs
@@ -155,7 +180,7 @@ def plot_metric_train_val(nr_epochs, hist, metric, path, filename, plot_title):
 
 
 def plot_roc_curve(filename, scores, labels):
-    """ Plots (saves) roc curve for a binary classification scenario
+    """plot_roc_curve plots (saves) roc curve for a binary classification scenario
 
     Arguments:
         filename {str} -- destination filename
@@ -189,7 +214,7 @@ def plot_roc_curve(filename, scores, labels):
 
 
 def plot_precision_recall_curve(filename, scores, labels):
-    """ Plots (saves) precision vs recall curve for a binary classification scenario
+    """plot_precision_recall_curve plots (saves) precision vs recall curve for a binary classification scenario
 
     Arguments:
         filename {str} -- destination filename
@@ -225,7 +250,7 @@ def plot_precision_recall_curve(filename, scores, labels):
 
 
 def plot_roc_curve_multiclass(filename, scores, labels, classes):
-    """ Plots (saves) roc curve for a multiclass classification scenario
+    """plot_roc_curve_multiclass plots (saves) roc curve for a multiclass classification scenario
 
     Arguments:
         filename {str} -- destination filename
@@ -357,7 +382,7 @@ def plot_roc_curve_multiclass(filename, scores, labels, classes):
 
 
 def plot_precision_recall_curve_multiclass(filename, scores, labels, classes):
-    """ Plots (saves) precision vs recall curve for a multiclass classification scenario
+    """plot_precision_recall_curve_multiclass plots (saves) precision vs recall curve for a multiclass classification scenario
 
     Arguments:
         filename {str} -- destination filename

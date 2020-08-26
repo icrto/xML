@@ -3,15 +3,15 @@ from VGG import vgg
 from ResNet50Mod import resnet50
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import layers as KL
-import numpy as np
 from tensorflow.keras.models import Model
 import os
-import utils
-import sys
 import matplotlib.pyplot as plt
 
 
 class ExplainerClassifierCNN:
+    """ ExplainerClassifierCNN class
+    """
+
     def __init__(
         self,
         img_size=(224, 224),
@@ -20,6 +20,15 @@ class ExplainerClassifierCNN:
         init_bias=3.0,
         pretrained=False,
     ):
+        """__init__ class constructor
+
+        Keyword Arguments:
+            img_size {tuple} -- image dimensions (default: {(224, 224)})
+            num_classes {int} -- number of classes (default: {2})
+            clf {str} -- classifier architecture (default: {"resnet50"})
+            init_bias {float} -- initial bias for explainer's batch normalisation layer (default: {3.0})
+            pretrained {bool} -- whether or not to load a pretrained model (resnet pretrained on imagenet) (default: {False})
+        """
         super(ExplainerClassifierCNN, self).__init__()
 
         self.img_size = img_size
@@ -46,12 +55,21 @@ class ExplainerClassifierCNN:
         self.build_model()
 
     def build_model(self):
+        """build_model builds the end-to-end model
+        """
         input_image = KL.Input(tuple(list(self.img_size) + [3]), name="input_img")
         explanation = self.explainer(input_image)
         decision = self.classifier([explanation, input_image])
         self.e2e_model = Model(inputs=[input_image], outputs=[explanation, decision])
 
     def save_architecture(self, timestamp, path):
+        """save_architecture saves a plot of the whole architecture and of its submodules
+
+        Arguments:
+            timestamp {str} -- destination folder name
+            path {str} -- destination path
+        """
+
         self.exp_model_filename = timestamp + "_model_exp.png"
         self.dec_model_filename = timestamp + "_model_clf.png"
         self.e2e_model_filename = timestamp + "_model_e2e.png"
@@ -68,18 +86,19 @@ class ExplainerClassifierCNN:
     def save_explanations(
         self, datagen, phase, path, test=False, classes=None, cmap=None,
     ):
-        """ Generates and saves explanations for a set of images given by dataloader
+        """save_explanations generates and saves explanations for a set of images given by the data generator
 
-            Arguments:
-                datagen {tf.keras.utils.Sequence} -- data generator
-                phase {int} -- training phase
-                path {str} -- directory to store the generated explanations
+        Arguments:
+            datagen {tf.keras.utils.Sequence} -- data generator
+            phase {int} -- training phase
+            path {str} -- directory to store the generated explanations
 
-            Keyword Arguments:
-                test {bool} -- whether we are running inference on the test set or not (default: {False})
-                classes {list} -- list of class names (default: {None})
-                cmap {str} -- matplotlib colourmap for the produced explanations (default: {None})
-            """
+        Keyword Arguments:
+            test {bool} -- whether we are running inference on the test set or not (default: {False})
+            classes {list} -- list of class names (default: {None})
+            cmap {str} -- matplotlib colourmap for the produced explanations (default: {None})
+        """
+
         # defines colourmap and pixel value range
         if cmap == "None":
             cmap = "seismic"
@@ -100,6 +119,7 @@ class ExplainerClassifierCNN:
                 (batch_imgs, input_dict), verbose=0
             )
 
+            # traverse the batch and plot and save each generated explanation
             for idx, img in enumerate(batch_imgs):
                 img = batch_imgs[idx]
                 expl = batch_expls[idx]

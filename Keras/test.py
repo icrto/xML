@@ -10,7 +10,7 @@ import argparse
 from dataset import load_data, DataGenerator
 import numpy as np
 from losses import unsupervised_explanation_loss, hybrid_explanation_loss
-from tensorflow.keras.optimizers import Adadelta, SGD
+from tensorflow.keras.optimizers import SGD
 
 np.random.seed(0)
 
@@ -19,9 +19,6 @@ parser = argparse.ArgumentParser(description="Configurable parameters.")
 # Processing parameters
 parser.add_argument(
     "--gpu", type=str, default="1", help="Which gpus to use in CUDA_VISIBLE_DEVICES."
-)
-parser.add_argument(
-    "--num_workers", type=int, default=4, help="Number of workers for dataloader."
 )
 
 # Model
@@ -34,7 +31,6 @@ parser.add_argument(
     default="/media/TOSHIBA6T/ICRTO",
     help="Folder where dataset is located.",
 )
-
 
 # Data parameters
 parser.add_argument(
@@ -49,12 +45,6 @@ parser.add_argument(
 )
 parser.add_argument(
     "--img_size", nargs="+", type=int, default=[224, 224], help="Input image size."
-)
-parser.add_argument(
-    "--aug_prob",
-    type=float,
-    default=0,
-    help="Probability of applying data augmentation to each image.",
 )
 
 # Testing parameters
@@ -72,7 +62,7 @@ parser.add_argument(
 parser.add_argument(
     "--init_bias",
     type=float,
-    default=2.0,
+    default=3.0,
     help="Initial bias for the batch norm layer of the Explainer. For more details see the paper.",
 )
 
@@ -88,7 +78,7 @@ parser.add_argument(
     "--alpha",
     type=float,
     default=0.9,
-    help="Alfa of the last training phase. Loss = alfa * Lclassif + (1-alfa) * Lexplic",
+    help="Alfa of the last training phase. Loss = alpha * Lclassif + (1-alpha) * Lexplic",
 )
 parser.add_argument(
     "--beta", type=float, help="Lexplic_unsup = beta * L1 + (1-beta) * Total Variation"
@@ -98,12 +88,7 @@ parser.add_argument(
     type=float,
     help="Lexplic_hybrid = beta * L1 + (1-beta) * Total Variation + gamma* Weakly Loss",
 )
-parser.add_argument(
-    "--class_weights",
-    action="store_true",
-    default=False,
-    help="Use class weighting in loss function.",
-)
+
 
 # Other (misc)
 parser.add_argument(
@@ -129,7 +114,7 @@ if args.beta is None:
 
 masks = False
 if args.loss == "hybrid":
-    masks = True  # ensure that the dataloader returns object detection masks
+    masks = True  # ensure that the data generator returns object detection masks
     if args.gamma is None:
         print("Please define a value for gamma.")
         sys.exit(-1)
@@ -151,20 +136,13 @@ model.e2e_model.compile(
     optimizer=SGD(),
     loss_weights={"classifier": args.alpha, "explainer": 1.0 - args.alpha,},
     loss={"explainer": loss_fn, "classifier": "categorical_crossentropy"},
-    metrics={"classifier": ["accuracy"]},
+    weighted_metrics={"classifier": ["accuracy"]},
 )
-# define class weights for imbalanced data
-if args.class_weights:
-    class_weights = "balanced"
-else:
-    class_weights = None
+
 
 # load test data and create test data generators
-_, _, test_df, weights, classes = load_data(
-    folder=args.dataset_path,
-    dataset=args.dataset,
-    masks=masks,
-    class_weights=class_weights,
+_, _, test_df, _, classes = load_data(
+    folder=args.dataset_path, dataset=args.dataset, masks=masks, class_weights=None,
 )
 
 test_datagen = DataGenerator(
@@ -194,6 +172,7 @@ for batch_imgs, input_dict in test_datagen:
 all_probs = np.array(all_probs)
 all_labels = np.array(all_labels)
 
+# plot roc & precision_recall curves
 if args.nr_classes > 2:  # multiclass
     utils.plot_roc_curve_multiclass(
         os.path.join(path, timestamp), all_probs, all_labels, classes

@@ -20,9 +20,6 @@ parser = argparse.ArgumentParser(description="Configurable parameters.")
 parser.add_argument(
     "--gpu", type=str, default="1", help="Which gpus to use in CUDA_VISIBLE_DEVICES."
 )
-parser.add_argument(
-    "--num_workers", type=int, default=4, help="Number of workers for dataloader."
-)
 
 # Directories and paths
 parser.add_argument(
@@ -73,7 +70,7 @@ parser.add_argument(
     "--pretrained",
     default=False,
     action="store_true",
-    help="True if one wants to load pre trained models in training phase 1, False otherwise.",
+    help="True if one wants to load the resnet50 classifier pretrained on imagenet.",
 )
 parser.add_argument(
     "-clf",
@@ -190,7 +187,7 @@ if args.beta is None:
 
 masks = False
 if args.loss == "hybrid":
-    masks = True  # ensure that the dataloader returns object detection masks
+    masks = True  # ensure that the data generator returns object detection masks
     if args.gamma is None:
         print("Please define a value for gamma.")
         sys.exit(-1)
@@ -235,7 +232,6 @@ model = ExplainerClassifierCNN(
 
 # save a summary of the model used
 model.save_architecture(timestamp, path)
-
 
 # define class weights for imbalanced data
 if args.class_weights:
@@ -288,7 +284,7 @@ for phase in range(3):
         utils.unfreeze(model.classifier)
 
     if args.opt == "sgd":
-        opt = SGD(lr=lr[phase], decay=args.decay, momentum=args.momentum,)
+        opt = SGD(lr=lr[phase], decay=args.decay, momentum=args.momentum)
     elif args.opt == "adadelta":
         opt = Adadelta()
 
@@ -299,7 +295,7 @@ for phase in range(3):
             "explainer": 1.0 - float(alpha[phase]),
         },
         loss={"explainer": loss_fn, "classifier": "categorical_crossentropy"},
-        metrics={"classifier": ["accuracy"]},
+        weighted_metrics={"classifier": ["accuracy"]},
     )
 
     model_filename = timestamp + "_phase" + str(phase) + "_model.h5"
@@ -315,6 +311,7 @@ for phase in range(3):
         model_path,
     )
 
+    # train the model for nr_epochs
     history = model.e2e_model.fit(
         train_datagen,
         validation_data=val_datagen,
@@ -324,12 +321,15 @@ for phase in range(3):
         use_multiprocessing=False,
         # class_weight={"classifier": weights, "explainer": None}, --> waiting for tensorflow to fix the bug and make this possible
     )
+
+    # at the end of each training phase, plot the evolution of several metrics and plot the resulting explanations
+    effective_nr_epochs = len(history.history["loss"])
     hist_df = utils.save_history(
         history,
         os.path.join(path, str(timestamp + "_phase" + str(phase) + "_history.csv")),
     )
     utils.plot_metric_train_val(
-        nr_epochs[phase],
+        effective_nr_epochs,
         hist_df,
         "classifier_loss",
         path,
@@ -337,7 +337,7 @@ for phase in range(3):
         "Classifier Loss",
     )
     utils.plot_metric_train_val(
-        nr_epochs[phase],
+        effective_nr_epochs,
         hist_df,
         "explainer_loss",
         path,
@@ -345,7 +345,7 @@ for phase in range(3):
         "Explainer Loss",
     )
     utils.plot_metric_train_val(
-        nr_epochs[phase],
+        effective_nr_epochs,
         hist_df,
         "loss",
         path,
@@ -353,7 +353,7 @@ for phase in range(3):
         "Global Loss",
     )
     utils.plot_metric_train_val(
-        nr_epochs[phase],
+        effective_nr_epochs,
         hist_df,
         "classifier_accuracy",
         path,
