@@ -1,19 +1,19 @@
 ## Description
 
-<p align="justify>
+<p align="justify">
           Synthetic Dataset composed by images containing polygons. Each polygon is defined by its **p** and **q** factors, where p is the number of vertices and q represents how these vertices are connected, for example, if q equals 3 then the 1st vertex connects to the 4th and so on. If p equals -1 then the polygon is a circle and the value of q is irrelevant.
 </p>
 
-<p align="justify>
+<p align="justify">
 Each polygon is randomly placed in the image, considering overlap, occlusion and rotation constraints.
 </p>
           
-<p align="justify>
+<p align="justify">
 For each generated image, annotations are created in Pascal VOC format, containing information regarding image characteristics and also the classification problem being solved. The polygon one is trying to identify is given, along with information about its existance in the image. If the polygon is present in the image, then bounding boxes are provided for each instance of the desired polygon. As of now, labels for problems like the ones described below are provided:
+          </p>
  * Does polygon X exist or not in the image?
  * How many X polygons exist in the image?
  * Where are polygons X located in the image?
-          </p>
           
 ## Configurable Parameters
   * folder='train': directory where dataset is to be stored/imported from
@@ -36,7 +36,7 @@ For each generated image, annotations are created in Pascal VOC format, containi
   * min_nr_vertices=3: minimum number of vertices
   * max_nr_vertices=13: maximum number of vertices
   
-  <p align="justify>
+ <p align="justify">
   If a json config file is given, these parameters are loaded from the file. If not, then parameters are given through arguments of the class constructor.
  </p>
    
