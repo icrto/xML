@@ -21,7 +21,7 @@ For each generated image, annotations are created in Pascal VOC format, containi
 * nr_images {int} -- number of images to generate (default: {100})
 * nr_targets {int} -- number of images to generate with the target polygon present. If -1 then this number is randomly chosen. (default: {-1})
 * polygon {list} -- target polygon used to generate annotations given by its parameters p and q (if p equals -1, corresponding to a circle, then q is irrelevant) (default: {[-1, None]})
-* outside_polygon {bool} -- polygon to place around target polygon (default: {False})
+* outside_polygon {bool} -- polygon to place around target polygon (if simplified mode is set, then this parameter has to be False) (default: {False})
 * background_colour {int} -- background image colour (default: {255})
 * img_height {int} -- image height (default: {224})
 * img_width {int} -- image width (default: {224})
