@@ -9,10 +9,12 @@ Each polygon is randomly placed in the image, considering overlap, occlusion and
 </p>
           
 <p align="justify">
-For each generated image, annotations are created in Pascal VOC format, containing information regarding image characteristics and also the classification problem being solved. The polygon one is trying to identify is given, along with information about its existance in the image. If the polygon is present in the image, then bounding boxes are provided for each instance of the desired polygon. As of now, labels for problems like the ones described below are provided:
+For each generated image, annotations are created in Pascal VOC format (see this <a href="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/example.xml">example</a>), containing information regarding image characteristics and also the classification problem being solved. The polygon one is trying to identify is given, along with information about its existance in the image. If the polygon is present in the image, then bounding boxes are provided for each instance of the desired polygon. As of now, labels for problems like the ones described below are provided:
           </p>
  * Does polygon X exist or not in the image?
+ 
  * How many X polygons exist in the image?
+ 
  * Where are polygons X located in the image?
           
 ## Configurable Parameters
@@ -45,7 +47,7 @@ For each generated image, annotations are created in Pascal VOC format, containi
 
   
  <p align="justify">
-  If a json config file is given, these parameters are loaded from the file. If not, then parameters are given through arguments of the class constructor.
+  If a json config file is given, these parameters are loaded from the file like <a href="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/config.json">this</a>. If not, then parameters are given through arguments of the class constructor. You can also use the method <code>create_default_config_file</code> to create a default configuration json file from the default parameters of the <code>Dataset</code> class constructor.
  </p>
    
  ## Examples
