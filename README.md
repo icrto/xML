@@ -341,11 +341,11 @@ We used `PyTorch 1.3.1` and `tensorflow.keras 2.4.0` (`tensorflow 2.3.0`) in `Py
 </p>
 
 <p align="justify">
-  For the <b>synthetic dataset</b>, you just need to download the <a href="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/data.zip">data</a> and point the variable <code>dataset_path</code> in <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> to the directory where you stored it.
+  For the <b>synthetic dataset</b>, you just need to download the <a href="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/data.zip">data</a> and point the variable <code>dataset_path</code> in <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> (PyTorch version) or <a href="https://github.com/icrto/xML/blob/master/Keras/train.py">train.py</a> (Keras version) to the directory where you stored it.
 </p>
 
 <p align="justify">
-  The same applies for the <b>imagenetHVZ</b> dataset. Download it <a href="https://drive.google.com/file/d/1K8tZPP5uYNwHw6-DIHXBdD8aIq234yaK/view?usp=sharing">here</a> and point the variable <code>dataset_path</code> in <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> to the directory where you stored it.
+  The same applies for the <b>imagenetHVZ</b> dataset. Download it <a href="https://drive.google.com/file/d/1K8tZPP5uYNwHw6-DIHXBdD8aIq234yaK/view?usp=sharing">here</a> and point the variable <code>dataset_path</code> in <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> (PyTorch version) or <a href="https://github.com/icrto/xML/blob/master/Keras/train.py">train.py</a> (Keras version) to the directory where you stored it.
 </p>
 
 <p align="justify">
@@ -385,11 +385,11 @@ data
 ```
 
 <p align="justify">
-  Note that for every one of these datasets or other ones you wish to explore, you can always reimplement the corresponding <code>load_data_dataset_name</code> method and add it to the <code>load_data</code> function. However, <b>keep in mind that the <code>__getitem__</code> function assumes that you have a <code>dataframe</code> containing the absolute path to every image and corresponding mask (only needed for the hybrid explanation loss), as well as its label</b> (check <a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py#L70">this line of the code</a>). Also, the <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py#L162">train.py</a> and <a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py#L114">test.py</a> files expect you to first call <code>load_data</code> to generate your training, validation and test dataframes, and only then create your <code>PyTorch datasets</code> and <code>dataloaders</code> with these dataframes.
+  Note that for every one of these datasets or other ones you wish to explore, you can always reimplement the corresponding <code>load_data_dataset_name</code> method and add it to the <code>load_data</code> function. However, <b>keep in mind that the <code>__getitem__</code> function assumes that you have a <code>dataframe</code> containing the absolute path to every image and corresponding mask (only needed for the hybrid explanation loss), as well as its label</b>. Also, the <code>train.py</code> and <code>test.py</code> files expect you to first call <code>load_data</code> to generate your training, validation and test dataframes, and only then create your <code>PyTorch datasets</code> and <code>dataloaders</code> (PyTorch version)/<code>data generators</code> (Keras version) with these dataframes.
 </p>
 
 <p align="justify">
-  After having done this, be sure to include the name of your dataset in the <code>dataset</code> argument (check <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py#L39">here</a> and <a href="https://github.com/icrto/xML/blob/master/PyTorch/test.py#L51">here</a>).
+  After having done this, be sure to include the name of your dataset in the <code>dataset</code> argument of the <code>train.py</code> and <code>test.py</code> files.
 </p>
 
 <p align="justify">
@@ -404,7 +404,7 @@ data
 python3 train.py --dataset imagenetHVZ --dataset_path <path_to_dataset> --nr_epochs 10,10,60 -bs 8 --init_bias 3.0 --loss hybrid --alpha 1.0,0.25,0.9 --beta 0.9 --gamma 1.0 -lr_clf 0.01,0,0.01 -lr_expl 0,0.01,0.01 --aug_prob 0.2 --opt sgd -clf resnet18 --early_patience 100,100,10 --folder <path_to_destination_folder>
 ```
 <p align="justify">
-  To <b>test</b> your model just run <code>test.py</code> including the path to your model (a <code>.pt file</code>). The script will save the produced explanations and a <code>.txt</code> file with the report of the obtained values in the same directory where your model is stored. If you wish to define other parameter values, follow the example below.
+  To <b>test</b> your model just run <code>test.py</code> including the path to your model (a <code>.pt</code> file in the PyTorch version and a <code>.h5</code> file in the Keras version). The script will save the produced explanations and a <code>.txt</code> file with the report of the obtained values in the same directory where your model is stored. If you wish to define other parameter values, follow the example below.
  </p>
 
 ```
