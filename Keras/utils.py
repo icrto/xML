@@ -34,7 +34,7 @@ plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
 def norm(img):
-    """ Scales image pixel values into the [0, 1] range
+    """norm scales image pixel values into the [0, 1] range
 
     Arguments:
         img {tensor} -- input image
@@ -66,7 +66,7 @@ def unfreeze(model):
 
 
 def create_folder(folder):
-    """ Creates folder (with timestamped filename) to store results and models
+    """create_folder creates folder (with timestamped filename) to store results and models
 
     Arguments:
         folder {str} -- folder

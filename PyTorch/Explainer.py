@@ -15,6 +15,15 @@ class Explainer(nn.Module):
         img_size=(224, 224),
         init_bias=10.0,
     ):
+        """__init__ class constructor
+
+        Keyword Arguments:
+            in_channels {int} -- number of input channels (default: {3})
+            exp_conv_filter_size {tuple} -- kernel size for convolutional layers (default: {(3, 3)})
+            exp_pool_size {int} --  pooling factor (default: {2})
+            img_size {tuple} -- image dimensions (default: {(224, 224)})
+            init_bias {float} -- initial bias for batch normalisation layer (default: {10.0})
+        """
 
         super(Explainer, self).__init__()
         self.in_channels = in_channels
@@ -55,7 +64,7 @@ class Explainer(nn.Module):
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
-        """ Initialises batch norm layer's bias to a pre-defined value.
+        """_init_weights initialises batch norm layer's bias to a pre-defined value.
             Guarantees that the initially produced explanations are white images (filled with ones) --> see paper for details.
 
         Arguments:
@@ -65,6 +74,13 @@ class Explainer(nn.Module):
             m.bias.data.fill_(self.init_bias)
 
     def forward(self, x):
+        """forward forward pass
+
+        Arguments:
+            x {torch.Tensor} -- input image
+        Returns:
+            torch.Tensor -- output explanation
+        """
         # stores the last convolutional layer for each level (to later add its resulting feature map to the corresponding upsampling layer as done in the original u-net)
         last_conv_per_level = []
         x = self.conv_mod0(x)

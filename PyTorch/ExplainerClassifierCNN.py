@@ -26,6 +26,15 @@ class ExplainerClassifierCNN(nn.Module):
         init_bias=3.0,
         pretrained=False,
     ):
+        """__init__ class constructor
+
+        Keyword Arguments:
+            img_size {tuple} -- image dimensions (default: {(224, 224)})
+            num_classes {int} -- number of classes (default: {2})
+            clf {str} -- classifier architecture (default: {"resnet50"})
+            init_bias {float} -- initial bias for explainer's batch normalisation layer (default: {3.0})
+            pretrained {bool} -- whether or not to load a pretrained model (resnet pretrained on imagenet)
+        """
         super(ExplainerClassifierCNN, self).__init__()
 
         self.img_size = img_size
@@ -82,7 +91,20 @@ class ExplainerClassifierCNN(nn.Module):
     def train(
         self, dataloader, optimiser, device, args, phase, weights, alpha, disable=False
     ):
+        """train train function
 
+        Arguments:
+            dataloader {torch.utils.data.Dataloader} -- dataloader from which to load the data
+            optimiser {torch.optim} -- optimiser
+            device {torch.device} -- device where models and data are stored (GPU or CPU)
+            args {argparser} -- arguments
+            phase {int} -- training phase
+            weights {array} -- class weights
+            alpha {float} -- alpha hyperparameter value for the current training phase
+
+        Keyword Arguments:
+            disable {bool} -- False to enable tqdm progress bar (default: {False})
+        """
         self.classifier.train()
         self.explainer.train()
 
@@ -134,6 +156,20 @@ class ExplainerClassifierCNN(nn.Module):
             optimiser.step()
 
     def validation(self, dataloader, device, args, alpha, disable=False):
+        """validation validation function
+
+        Arguments:
+            dataloader {torch.utils.data.Dataloader} -- dataloader from which to load the data
+            device {torch.device} -- device where models and data are stored (GPU or CPU)
+            args {argparser} -- arguments
+            alpha {float} -- alpha hyperparameter value for the current training phase
+
+        Keyword Arguments:
+            disable {bool} -- False to enable tqdm progress bar (default: {False})
+
+        Returns:
+            misc -- validation losses and metrics
+        """
 
         self.classifier.eval()
         self.explainer.eval()
@@ -207,6 +243,20 @@ class ExplainerClassifierCNN(nn.Module):
         return val_loss, val_exp_loss, val_dec_loss, val_acc
 
     def test(self, dataloader, device, args, alpha, disable=False):
+        """test test function
+
+        Arguments:
+            dataloader {torch.utils.data.Dataloader} -- dataloader from which to load the data
+            device {torch.device} -- device where models and data are stored (GPU or CPU)
+            args {argparser} -- arguments
+            alpha {float} -- alpha hyperparameter value for the current training phase
+
+        Keyword Arguments:
+            disable {bool} -- False to enable tqdm progress bar (default: {False})
+
+        Returns:
+            misc -- losses and predictions
+        """
 
         self.classifier.eval()
         self.explainer.eval()
@@ -300,7 +350,7 @@ class ExplainerClassifierCNN(nn.Module):
         classes=None,
         cmap=None,
     ):
-        """ Generates and saves explanations for a set of images given by dataloader
+        """save_explanations generates and saves explanations for a set of images given by dataloader
 
         Arguments:
             dataloader {torch.utils.data.Dataloader} -- dataloader
@@ -421,7 +471,7 @@ class ExplainerClassifierCNN(nn.Module):
         print()
 
     def checkpoint(self, filename, epoch, batch_loss, batch_acc, optimiser):
-        """ Saves model when validation loss/accuracy improves and at every epoch
+        """checkpoint saves model when validation loss/accuracy improves and at every epoch
 
         Arguments:
             filename {str} -- checkpoint filename

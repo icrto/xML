@@ -31,7 +31,7 @@ from albumentations import (
 
 
 def strong_aug(p=0.5):
-    """ Data augmentation function
+    """strong_aug Data augmentation function
 
     Keyword Arguments:
         p {float} -- probability of applying data augmentation (default: {.5})
@@ -86,6 +86,18 @@ class Dataset(torch.utils.data.Dataset):
     def __init__(
         self, df, preprocess=utils.norm, masks=False, img_size=(224, 224), aug_prob=0
     ):
+        """__init__ class constructor
+
+        Arguments:
+            df {pandas dataframe} -- dataframe from which to load data
+
+        Keyword Arguments:
+            preprocess {function} --  preprocessing function to apply to each image (default: {utils.norm})
+            masks {bool} -- whether or not to load the binary masks for the hybrid explanation loss (default: {False})
+            img_size {tuple} -- image dimensions (default: {(224, 224)})
+            aug_prob {int} -- probability of applying data augmentation (default: {0})
+        """
+
         super(Dataset, self).__init__()
         self.df = df
         self.preprocess = preprocess
@@ -95,9 +107,22 @@ class Dataset(torch.utils.data.Dataset):
         self.len = len(self.df)
 
     def __len__(self):
+        """__len__ length
+
+        Returns:
+            int -- number of instances in the dataframe
+        """
         return self.len
 
     def __getitem__(self, index):
+        """__getitem__ generates a batch of data
+
+        Arguments:
+            index {int} -- image index
+
+        Returns:
+            tuple -- returns the image and its label, its iD and its binary mask
+        """
         img_name = self.df.iloc[index]["imageID"]
         img = cv2.imread(img_name, cv2.IMREAD_UNCHANGED)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -140,7 +165,7 @@ class Dataset(torch.utils.data.Dataset):
 
 
 def load_synthetic_dataset(folder, masks=False, class_weights=None):
-    """ Loads synthetic dataset
+    """load_synthetic_dataset loads synthetic dataset
 
     Arguments:
         folder {str} -- directory where dataset is stored
@@ -191,7 +216,7 @@ def load_synthetic_dataset(folder, masks=False, class_weights=None):
 
 
 def load_NIH_NCI(folder, masks=False, class_weights=None):
-    """ Loads NIH-NCI cervical cancer dataset
+    """load_NIH_NCI loads NIH-NCI cervical cancer dataset
 
     Arguments:
         folder {str} -- directory where dataset is stored
@@ -276,7 +301,7 @@ def load_NIH_NCI(folder, masks=False, class_weights=None):
 
 
 def load_imagenetHVZ(folder, masks=False, class_weights=None):
-    """ Loads imagenetHVZ dataset
+    """load_imagenetHVZ loads imagenetHVZ dataset
 
     Arguments:
         folder {str} -- directory where dataset is stored
@@ -349,7 +374,7 @@ def load_imagenetHVZ(folder, masks=False, class_weights=None):
 
 
 def load_data(folder, dataset="imagenetHVZ", masks=False, class_weights=None):
-    """ Triage function to select corresponding loading function according to chosen dataset
+    """load_data triage function to select corresponding loading function according to chosen dataset
 
     Arguments:
         folder {str} -- directory where dataset is stored

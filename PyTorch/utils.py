@@ -27,7 +27,7 @@ plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
 def norm(img):
-    """ Scales image into [0, 1]
+    """norm scales image pixel values into the [0, 1] range
 
     Arguments:
         img {tensor} -- input image
@@ -39,7 +39,7 @@ def norm(img):
 
 
 def freeze(model):
-    """ Freezes model layers
+    """freeze freezes model layers
 
     Arguments:
         model {PyTorch model} -- model
@@ -49,7 +49,7 @@ def freeze(model):
 
 
 def unfreeze(model):
-    """ Unfreezes model layers
+    """unfreeze unfreezes model layers
 
     Arguments:
         model {PyTorch model} -- model
@@ -59,7 +59,7 @@ def unfreeze(model):
 
 
 def create_folder(folder):
-    """ Creates folder (with timestamped filename) to store results and models
+    """create_folder creates folder (with timestamped filename) to store results and models
 
     Arguments:
         folder {str} -- folder
@@ -80,7 +80,7 @@ def create_folder(folder):
 
 
 def plot_metric_train_val(nr_epochs, history_csv, metric, path, filename, plot_title):
-    """ Plots (saves) training and validation evolution of specified metric
+    """plot_metric_train_val plots (saves) training and validation evolution of specified metric
 
     Arguments:
         nr_epochs {int} -- total number of epochs
@@ -109,7 +109,7 @@ def plot_metric_train_val(nr_epochs, history_csv, metric, path, filename, plot_t
 
 
 def plot_roc_curve(filename, scores, labels):
-    """ Plots (saves) roc curve for a binary classification scenario
+    """plot_roc_curve plots (saves) roc curve for a binary classification scenario
 
     Arguments:
         filename {str} -- destination filename
@@ -143,7 +143,7 @@ def plot_roc_curve(filename, scores, labels):
 
 
 def plot_precision_recall_curve(filename, scores, labels):
-    """ Plots (saves) precision vs recall curve for a binary classification scenario
+    """plot_precision_recall_curve plots (saves) precision vs recall curve for a binary classification scenario
 
     Arguments:
         filename {str} -- destination filename
@@ -179,7 +179,7 @@ def plot_precision_recall_curve(filename, scores, labels):
 
 
 def plot_roc_curve_multiclass(filename, scores, labels, classes):
-    """ Plots (saves) roc curve for a multiclass classification scenario
+    """plot_roc_curve_multiclass plots (saves) roc curve for a multiclass classification scenario
 
     Arguments:
         filename {str} -- destination filename
@@ -311,7 +311,7 @@ def plot_roc_curve_multiclass(filename, scores, labels, classes):
 
 
 def plot_precision_recall_curve_multiclass(filename, scores, labels, classes):
-    """ Plots (saves) precision vs recall curve for a multiclass classification scenario
+    """plot_precision_recall_curve_multiclass plots (saves) precision vs recall curve for a multiclass classification scenario
 
     Arguments:
         filename {str} -- destination filename

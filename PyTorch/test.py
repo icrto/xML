@@ -77,7 +77,7 @@ parser.add_argument(
     "--alpha",
     type=float,
     default=0.9,
-    help="Alfa of the last training phase. Loss = alfa * Lclassif + (1-alfa) * Lexplic",
+    help="Alfa of the last training phase. Loss = alpha * Lclassif + (1-alpha) * Lexplic",
 )
 parser.add_argument(
     "--beta", type=float, help="Lexplic_unsup = beta * L1 + (1-beta) * Total Variation"
@@ -86,12 +86,6 @@ parser.add_argument(
     "--gamma",
     type=float,
     help="Lexplic_hybrid = beta * L1 + (1-beta) * Total Variation + gamma* Weakly Loss",
-)
-parser.add_argument(
-    "--class_weights",
-    action="store_true",
-    default=False,
-    help="Use class weighting in loss function.",
 )
 
 # Other (misc)
@@ -144,19 +138,11 @@ model.classifier.load_state_dict(ckpt["classifier"])
 model.explainer.load_state_dict(ckpt["explainer"])
 model.to(device)
 
-if args.class_weights:
-    class_weights = "balanced"
-else:
-    class_weights = None
 
 # load test data and create test loaders
-_, _, test_df, weights, classes = load_data(
-    folder=args.dataset_path,
-    dataset=args.dataset,
-    masks=masks,
-    class_weights=class_weights,
+_, _, test_df, _, classes = load_data(
+    folder=args.dataset_path, dataset=args.dataset, masks=masks, class_weights=None,
 )
-weights = torch.FloatTensor(weights).to(device)
 
 test_dataset = Dataset(test_df, masks=masks, img_size=img_size, aug_prob=0)
 test_loader = DataLoader(
