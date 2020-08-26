@@ -451,7 +451,7 @@ Other interpretability methods → [innvestigate](https://github.com/albermax/in
 
 ## TODO
 - [x] update keras version
-- [ ] update synthetic dataset generation script
+- [x] update synthetic dataset generation script
 - [x] upload synthetic data
 
 ## Contact Info
