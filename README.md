@@ -39,8 +39,6 @@ Some preliminary work was published in:
  }
 ```
 
-**IMPORTANT: the Keras version is currently not up-to-date with the most recent PyTorch version!**
-
 ## Contents
 
 [***Architecture***](https://github.com/icrto/xML#Architecture)
@@ -328,8 +326,9 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 ## Requirements
 
 For the PyTorch version please consult [requirements_pytorch.txt](https://github.com/icrto/xML/blob/master/requirements_pytorch.txt). 
+For the Keras version please consult [requirements_keras.txt](https://github.com/icrto/xML/blob/master/requirements_keras.txt). 
 
-We used `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
+We used `PyTorch 1.3.1` and `tensorflow.keras 2.4.0` (`tensorflow 2.3.0`) in `Python 3.6.9`.
 
 ## Usage
 
@@ -338,7 +337,7 @@ We used `PyTorch 1.3.1` and `Keras 2.2.4` in `Python 3.6.9`.
 </p>
 
 <p align="justify">
-  In the <a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py">Dataset.py</a> file you can find the function <code>load_data</code> implemented, as well as individual methods to process and load our synthetic dataset, the imagenetHVZ dataset and the NIH-NCI Cervical Cancer Dataset.
+  In the <a href="https://github.com/icrto/xML/blob/master/PyTorch/Dataset.py">Dataset.py</a> (PyTorch version) or  <a href="https://github.com/icrto/xML/blob/master/Keras/dataset.py">dataset.py</a> (Keras version) files you can find the function <code>load_data</code> implemented, as well as individual methods to process and load our synthetic dataset, the imagenetHVZ dataset and the NIH-NCI Cervical Cancer Dataset.
 </p>
 
 <p align="justify">
@@ -436,7 +435,7 @@ Other interpretability methods → [innvestigate](https://github.com/albermax/in
 
 
 ## TODO
-- [ ] update keras version
+- [x] update keras version
 - [ ] update synthetic dataset generation script
 - [x] upload synthetic data
 
