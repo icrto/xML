@@ -361,4 +361,7 @@ for phase in range(3):
         "Accuracy",
     )
 
+    # load best model
+    model.e2e_model.load_weights(model_path)
+
     model.save_explanations(val_datagen, phase, path, classes=classes, cmap="viridis")

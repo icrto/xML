@@ -470,6 +470,11 @@ for phase in range(3):
         os.path.join(path, timestamp + "_phase" + str(phase) + "_classifier_acc.png"),
         "Accuracy",
     )
+
+    # Load best model
+    ckpt = torch.load(checkpoint_filename + "_best_loss.pt", map_location=device)
+    model.classifier.load_state_dict(ckpt["classifier"])
+    model.explainer.load_state_dict(ckpt["explainer"])
     model.save_explanations(
         val_loader, phase, device, path, classes=classes, cmap="viridis"
     )
