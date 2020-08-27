@@ -59,9 +59,7 @@ Some preliminary work was published in:
 
 [***Credits***](https://github.com/icrto/xML#Credits)
 
-
-[***TODO***](https://github.com/icrto/xML#TODO)
-
+[***Contact Info***](https://github.com/icrto/xML#contact-info)
 
 
 ## Architecture
@@ -447,12 +445,6 @@ Deep Taylor Decomposition → [Deep-Taylor-Decomposition](https://github.com/myc
 
 Other interpretability methods → [innvestigate](https://github.com/albermax/innvestigate)
 
-
-
-## TODO
-- [x] update keras version
-- [ ] update synthetic dataset generation script
-- [x] upload synthetic data
 
 ## Contact Info
 
