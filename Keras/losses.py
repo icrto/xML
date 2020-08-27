@@ -1,5 +1,6 @@
 import tensorflow.keras.backend as K
 import numpy as np
+import tensorflow as tf
 
 eps = 1e-6  # additive constant to avoid divisions by 0
 
@@ -52,8 +53,13 @@ def hybrid_explanation_loss(beta, gamma):
         tv = K.mean(K.abs(y_pred[:-1] - y_pred[1:])) + K.mean(
             K.abs(y_pred[:, :-1] - y_pred[:, 1:])
         )
-        weakly = np.abs(
-            np.divide(np.sum(np.multiply(1 - y_true, y_pred)), np.sum(1 - y_true) + eps)
+
+        y_true = tf.cast(y_true, tf.float32)
+        weakly = tf.math.abs(
+            tf.math.divide(
+                tf.math.reduce_sum(tf.math.multiply(1 - y_true, y_pred)),
+                tf.math.reduce_sum(1 - y_true) + eps,
+            )
         )
         return beta * l1 + (1 - beta) * tv + gamma * weakly
 
