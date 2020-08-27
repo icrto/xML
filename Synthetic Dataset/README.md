@@ -53,4 +53,24 @@ For each generated image, annotations are created in Pascal VOC format (see this
  </p>
    
  ## Examples
- <img src="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/examples.png" width="1000">
+ 
+ <p align="justify">
+          Here you can find some examples of images you can generate.
+           </p>
+          <img src="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/examples.png" width="1000">
+ 
+ ## Results
+ 
+<p align="justify">
+          Here you can find some of the obtained results.
+</p>
+  
+<p align="justify">
+          This is the result of the unsupervised explanation loss with α = 0.99 and β = 0.1.
+          <img src="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/alpha_099_beta_01_img4.png">
+</p>
+ 
+ <p align="justify">
+          Here we have the result of the unsupervised explanation loss with α = 0.99 and β = 0.25 on a dataset made of triangles only.
+          <img src="https://github.com/icrto/xML/blob/master/Synthetic%20Dataset/ alpha_099_beta_025_triangles_only.png">
+ </p>
