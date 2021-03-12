@@ -262,7 +262,7 @@ For results on synthetic data check <a href="https://github.com/icrto/xML/tree/m
 ### ImagenetHVZ
 
 <p align="justify">
-  As the name implies, this dataset is a sub-set of <a href="http://www.image-net.org">ImageNet</a>, composed only by horses and zebras (synsets n02389026 and n02391049, respectively). Of the 2600 images, we kept only the ones for which bounding boxes were available, totalling 324 images of horses and 345 images of zebras. Data was split into 85%-15% for training and testing, giving a total of 100 images for the latter. The training set was further split into 80%-20% for training and validation. You can find this dataset <a href="">here</a>.
+  As the name implies, this dataset is a sub-set of <a href="http://www.image-net.org">ImageNet</a>, composed only by horses and zebras (synsets n02389026 and n02391049, respectively). Of the 2600 images, we kept only the ones for which bounding boxes were available, totalling 324 images of horses and 345 images of zebras. Data was split into 85%-15% for training and testing, giving a total of 100 images for the latter. The training set was further split into 80%-20% for training and validation. You can find this dataset <a href="https://drive.google.com/file/d/1lcxmfDCYOgpXzZn4IqtDT2ezxKK6h6o4/view?usp=sharing">here</a>.
  </p>
 
 <p align="justify">
@@ -358,7 +358,7 @@ We used `PyTorch 1.3.1` and `tensorflow.keras 2.4.0` (`tensorflow 2.3.0`) in `Py
 </p>
 
 <p align="justify">
-  The same applies for the <b>imagenetHVZ</b> dataset. Download it <a href="https://drive.google.com/file/d/1K8tZPP5uYNwHw6-DIHXBdD8aIq234yaK/view?usp=sharing">here</a> and point the variable <code>dataset_path</code> in <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> (PyTorch version) or <a href="https://github.com/icrto/xML/blob/master/Keras/train.py">train.py</a> (Keras version) to the directory where you stored it.
+  The same applies for the <b>imagenetHVZ</b> dataset. Download it <a href="https://drive.google.com/file/d/1lcxmfDCYOgpXzZn4IqtDT2ezxKK6h6o4/view?usp=sharing">here</a> and point the variable <code>dataset_path</code> in <a href="https://github.com/icrto/xML/blob/master/PyTorch/train.py">train.py</a> (PyTorch version) or <a href="https://github.com/icrto/xML/blob/master/Keras/train.py">train.py</a> (Keras version) to the directory where you stored it.
 </p>
 
 <p align="justify">
