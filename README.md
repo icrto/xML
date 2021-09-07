@@ -10,7 +10,7 @@ If you use this repository, please cite:
 ```
 
 @article{
-  author = {Rio-Torto, Isabel and Fernandes, Kelwin and Teixeira, Luís F}
+  author = {Rio-Torto, Isabel and Fernandes, Kelwin and Teixeira, Luís F},
   doi = {10.1016/j.patrec.2020.04.004},
   issn = {01678655},
   journal = {Pattern Recognition Letters},
@@ -18,7 +18,7 @@ If you use this repository, please cite:
   number = {C},
   pages = {373--380},
   title = {{Understanding the decisions of CNNs: An in-model approach}},
-  url = {http://www.sciencedirect.com/science/article/pii/S0167865520301240}
+  url = {http://www.sciencedirect.com/science/article/pii/S0167865520301240},,
   volume = {133},
   year = {2020}
 }
